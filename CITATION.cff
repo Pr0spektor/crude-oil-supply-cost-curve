@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Global crude-oil supply cost curve (breakeven benchmarking)"
+message: "If you use this software, please cite it using these metadata."
+type: software
+authors:
+  - alias: Pr0spektor
+repository-code: "https://github.com/Pr0spektor/crude-oil-supply-cost-curve"
+abstract: >-
+  An energy-market analytical tool that ranks global crude-oil supply by breakeven
+  cost, builds the cumulative supply cost curve, identifies the marginal barrel for
+  a demand scenario, and quantifies uneconomic production at a given oil price on
+  both full-cycle (new-investment) and cash-cost (shut-in) views. Implemented as an
+  interactive Excel workbook with live SUMIF logic and an auditable, unit-tested
+  Python engine that agree exactly.
+keywords:
+  - oil-and-gas
+  - energy-markets
+  - supply-cost-curve
+  - breakeven-analysis
+  - benchmarking
+  - upstream
+  - energy-analytics
+license: MIT
+version: "1.0.0"
+date-released: "2026-07-10"
