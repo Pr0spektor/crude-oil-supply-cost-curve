@@ -1,40 +1,114 @@
 {
-  "total_supply_mmbd": 98.5,
-  "scenarios": {
+  "supply_crude_condensate_mmbd": 82.1,
+  "total_liquids_ref_mmbd": 103.0,
+  "demand_mmbd": 82.0,
+  "marginal_barrel": {
+    "demand_mmbd": 82.0,
+    "marginal_cost": 78,
+    "marginal_segment": "Arctic / frontier",
+    "supplied": true
+  },
+  "avg_cost_to_meet_demand": 40.0,
+  "price_scenarios": {
     "stress_40": {
       "price": 40.0,
-      "cost_view": "full",
-      "at_risk_mmbd": 51.5,
-      "economic_mmbd": 47.0,
-      "at_risk_share": 0.5228426395939086
+      "full_cycle": {
+        "price": 40.0,
+        "cost_view": "full",
+        "at_risk_mmbd": 36.3,
+        "economic_mmbd": 45.8,
+        "at_risk_share": 0.44214372716199757
+      },
+      "cash": {
+        "price": 40.0,
+        "cost_view": "cash",
+        "at_risk_mmbd": 9.100000000000001,
+        "economic_mmbd": 73.0,
+        "at_risk_share": 0.1108404384896468
+      }
     },
-    "base_60": {
-      "price": 60.0,
-      "cost_view": "full",
-      "at_risk_mmbd": 6.5,
-      "economic_mmbd": 92.0,
-      "at_risk_share": 0.06598984771573604
+    "base_65": {
+      "price": 65.0,
+      "full_cycle": {
+        "price": 65.0,
+        "cost_view": "full",
+        "at_risk_mmbd": 4.1,
+        "economic_mmbd": 78.0,
+        "at_risk_share": 0.049939098660170524
+      },
+      "cash": {
+        "price": 65.0,
+        "cost_view": "cash",
+        "at_risk_mmbd": 0,
+        "economic_mmbd": 82.1,
+        "at_risk_share": 0.0
+      }
     },
-    "high_80": {
-      "price": 80.0,
-      "cost_view": "full",
-      "at_risk_mmbd": 1.5,
-      "economic_mmbd": 97.0,
-      "at_risk_share": 0.015228426395939087
+    "high_85": {
+      "price": 85.0,
+      "full_cycle": {
+        "price": 85.0,
+        "cost_view": "full",
+        "at_risk_mmbd": 0,
+        "economic_mmbd": 82.1,
+        "at_risk_share": 0.0
+      },
+      "cash": {
+        "price": 85.0,
+        "cost_view": "cash",
+        "at_risk_mmbd": 0,
+        "economic_mmbd": 82.1,
+        "at_risk_share": 0.0
+      }
     }
   },
-  "shut_in_at_40": {
-    "price": 40,
-    "cost_view": "cash",
-    "at_risk_mmbd": 6.5,
-    "economic_mmbd": 92.0,
-    "at_risk_share": 0.06598984771573604
+  "monte_carlo": {
+    "stress_40": {
+      "price": 40.0,
+      "n": 10000,
+      "mean_at_risk_mmbd": 43.753200000004405,
+      "p10": 35.599999999999994,
+      "p50": 44.7,
+      "p90": 52.900000000000006,
+      "min": 27.400000000000002,
+      "max": 58.2
+    },
+    "base_65": {
+      "price": 65.0,
+      "n": 10000,
+      "mean_at_risk_mmbd": 6.990540000000238,
+      "p10": 4.1,
+      "p50": 5.8,
+      "p90": 11.100000000000001,
+      "min": 0.8,
+      "max": 16.1
+    },
+    "high_85": {
+      "price": 85.0,
+      "n": 10000,
+      "mean_at_risk_mmbd": 0.15495999999999463,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 0.8,
+      "min": 0.0,
+      "max": 0.8
+    }
   },
-  "marginal_barrel_at_demand": {
-    "demand_mmbd": 100.0,
-    "marginal_cost": 85,
-    "marginal_segment": "Arctic / frontier",
-    "supplied": false
-  },
-  "avg_cost_to_meet_90": 40.0
+  "cost_inflation": {
+    "base": {
+      "inflation": 0.0,
+      "marginal_barrel_at_demand": 78.0,
+      "at_risk_at_65_full": 4.1
+    },
+    "supply_chain_+15%": {
+      "inflation": 0.15,
+      "marginal_barrel_at_demand": 89.69999999999999,
+      "at_risk_at_65_full": 15.3
+    },
+    "deflation_-10%": {
+      "inflation": -0.1,
+      "marginal_barrel_at_demand": 70.2,
+      "at_risk_at_65_full": 0.8
+    }
+  }
 }

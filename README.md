@@ -1,82 +1,72 @@
 # crude-oil-supply-cost-curve
 
-**Global crude-oil supply cost curve — breakeven benchmarking.** A compact,
-Energy-Solutions-style analytical tool that ranks oil supply by breakeven ($/bbl),
-builds the cumulative supply cost curve, finds the marginal barrel needed to meet
-demand, and quantifies how much production is uneconomic at a given oil price.
-Implemented as an **interactive Excel workbook** (live SUMIF logic) and an
-**auditable, unit-tested Python engine** that agree exactly.
+**Global crude-oil supply cost curve — breakeven benchmarking with uncertainty.**
+An energy-market analytical tool that ranks world crude + condensate supply by
+*economic* breakeven ($/bbl), builds the cumulative supply cost curve, finds the
+marginal barrel that clears demand, and quantifies how much production is uneconomic
+at a given oil price — with Monte-Carlo uncertainty, cost-inflation scenarios, and a
+written insight memo. Implemented as an **interactive Excel workbook** (live SUMIF)
+and an **auditable, unit-tested Python engine** that agree exactly.
 
-Author: **Pr0spektor** · Bonn, Germany · [github.com/Pr0spektor](https://github.com/Pr0spektor)
+Author: **[Pr0spektor](https://github.com/Pr0spektor)**
 
 ---
 
 ## The question it answers
+*"Oil falls to $40/bbl — how much supply is underwater, which segment sets the
+marginal price, and where does new investment stop making sense?"* — read straight
+off the curve, with the uncertainty around the answer made explicit.
 
-*"Oil just fell to $40/bbl. How much of world supply is now underwater, which
-segment sets the marginal price, and where does new investment stop making sense?"*
+## Headline results (23 publicly-anchored nodes, ~82 mmb/d crude + condensate)
 
-This is a staple of energy-market intelligence: producers, investors and trading
-desks read the supply cost curve to judge price floors, capital discipline and
-which barrels clear the market. The method — rank supply cheapest-first, read the
-clearing cost off the curve — follows the public cost-curve work of the IEA, EIA
-and Rystad Energy.
+| Oil price | New-investment at risk (full-cycle) | Shut-in risk (cash) | Full-cycle P10–P90 (Monte-Carlo) |
+|---|---|---|---|
+| **$40** | 36.3 mmb/d (44%) | 6.5 mmb/d | 35.6 – 52.9 |
+| **$65** | 4.1 mmb/d (5%) | 0 | 4.1 – 11.1 |
+| **$85** | 0 | 0 | 0 – 0.8 |
 
-## Headline results (illustrative dataset, ~98.5 mmb/d)
+Marginal barrel to clear ~82 mmb/d demand ≈ **$78/bbl** (Arctic/frontier). A **+15%**
+cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15 mmb/d.
+*US-shale nodes use Dallas Fed Q1 2025 breakevens ($61–63 new well; $33–41 shut-in).*
 
-| Oil price | New-investment at risk (full-cycle) | Shut-in risk (cash cost) |
-|---|---|---|
-| **$40/bbl** | 51.5 mmb/d (52%) | 6.5 mmb/d |
-| **$60/bbl** | 6.5 mmb/d (7%) | 0 |
-| **$80/bbl** | 1.5 mmb/d (2%) | 0 |
-
-*Two cost views matter: **full-cycle** breakeven governs whether NEW investment is
-sanctioned; **cash cost** governs whether EXISTING output is shut in. High-cost
-supply stops attracting capital long before it is actually curtailed.*
-
-![Supply cost curve](results/supply_cost_curve.png)
+![Supply cost curve with uncertainty](results/supply_cost_curve.png)
 ![Supply at risk vs price](results/price_sensitivity.png)
+![Monte-Carlo distribution](results/monte_carlo.png)
 
-## What's in the model
+**→ One-page findings: [INSIGHT_MEMO.md](INSIGHT_MEMO.md)** (auto-generated; numbers reconcile with the model).
 
-- **Cost curve** — segments sorted cheapest-first with cumulative production.
-- **Marginal barrel** — the clearing cost to meet a demand scenario (flags a
-  shortfall when demand exceeds supply).
-- **At-risk volume** — production above the oil price, on both full-cycle and
-  cash-cost views, with the at-risk share of supply.
-- **Price sensitivity** — how at-risk volume changes across $30–90/bbl.
+## What makes it decision-grade
+- **Two cost views, not conflated** — full-cycle (new-investment) vs cash cost
+  (shut-in), and *fiscal* breakeven explicitly excluded. See [docs/METHODS.md](docs/METHODS.md).
+- **Uncertainty, not false precision** — every breakeven carries a (low, high) range;
+  Monte-Carlo (10k seeded draws) reports P10/P50/P90 of the at-risk volume.
+- **Scenarios** — price stress and cost-inflation grid.
+- **Sourced data** — Dallas Fed, EIA, IEA, Rystad public figures ([SOURCES.md](SOURCES.md)).
+- **Synthesis** — a McKinsey-style insight memo with the "so what".
 
 ## Repository layout
-
 ```
-src/costcurve.py     # engine: build_curve, marginal_barrel, uneconomic_volume … (stdlib only)
-src/assets.py        # supply-segment dataset (production, full-cycle & cash breakeven)
-src/build_workbook.py# writes model.xlsx (live SUMIF) + charts + summary.json
-tests/test_costcurve.py # 13 unit tests (hand-checked fixture)
-model.xlsx           # interactive workbook: Assets → CostCurve → Outputs
-results/             # cost-curve & sensitivity charts + summary.json
+src/costcurve.py     # engine: curve, marginal barrel, at-risk, Monte-Carlo, inflation (stdlib)
+src/data.py          # 23 sourced supply nodes (production, full & cash breakeven, ranges)
+src/analysis.py      # charts + summary.json + auto-generated INSIGHT_MEMO.md
+src/build_workbook.py# model.xlsx: Outputs (live SUMIF) · Data · CostCurve · Scenarios · MonteCarlo
+tests/test_costcurve.py # 18 unit tests (hand-checked fixtures, seeded Monte-Carlo)
+docs/METHODS.md · SOURCES.md · INSIGHT_MEMO.md
 ```
 
 ## Run it
-
 ```bash
-python src/build_workbook.py     # (re)build model.xlsx + charts  (needs openpyxl, matplotlib)
-python tests/test_costcurve.py   # 13/13 tests, standalone …
+python src/analysis.py        # charts + memo + summary.json
+python src/build_workbook.py  # interactive model.xlsx
+python tests/test_costcurve.py   # 18/18, standalone …
 pytest -q                        # … or under pytest (CI)
 ```
+Open **`model.xlsx`**, change the oil-price cell on **Outputs** — at-risk volumes
+recompute via `SUMIF` (no macros). Verified by recalculating headless in LibreOffice.
 
-Open **`model.xlsx`**, change the oil-price cell on the **Outputs** sheet, and the
-at-risk volumes recompute natively via `SUMIF` (no macros). Verified by recalculating
-the workbook headless in LibreOffice — Excel and Python match.
-
-## Data & caveats
-
-Segment production and breakeven figures follow the **shape** of public supply cost
-curves (IEA WEO, EIA, Rystad Energy UCube) but are **illustrative planning inputs**,
-not audited asset economics, and are deliberately simplified (nine global segments).
-This is a method demonstrator for decision support, not investment advice; use a
-licensed asset-level database for commercial work.
+## Caveats
+Publicly-anchored, simplified (23-node) planning inputs — not a licensed asset-level
+database, not investment advice. See METHODS/SOURCES for full provenance and limits.
 
 ## License
-
 MIT — see [LICENSE](LICENSE).

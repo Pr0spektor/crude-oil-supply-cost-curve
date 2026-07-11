@@ -1,6 +1,8 @@
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from costcurve import Segment, build_curve, total_supply, marginal_barrel, uneconomic_volume, price_sensitivity, average_cost_to_meet
+from costcurve import (Segment, build_curve, total_supply, marginal_barrel,
+                       uneconomic_volume, price_sensitivity, average_cost_to_meet,
+                       apply_cost_inflation, monte_carlo_at_risk)
 
 def approx(a, b, rel=1e-6, abs_=1e-9):
     """Returns True if a and b are approximately equal."""
@@ -124,6 +126,42 @@ def test_average_cost_to_meet_monotonic():
         assert avg_cost >= prev_avg_cost, \
             f"Average cost should increase: prev={prev_avg_cost}, demand={demand}, curr={avg_cost}"
         prev_avg_cost = avg_cost
+
+def test_band_default_pm20():
+    """A segment with no explicit low/high gets a +/-20% band."""
+    s = Segment("A", "R", 10, 50, 30)
+    lo, hi = s.band()
+    assert approx(lo, 40.0) and approx(hi, 60.0)
+
+def test_band_explicit():
+    s = Segment("A", "R", 10, 50, 30, "", 45, 58)
+    assert s.band() == (45, 58)
+
+def test_apply_cost_inflation_scales():
+    segs = [Segment("A", "R", 10, 50, 30), Segment("B", "R", 5, 20, 10)]
+    up = apply_cost_inflation(segs, 0.10)
+    assert approx(up[0].breakeven_full, 55.0) and approx(up[0].cash_cost, 33.0)
+    assert approx(up[1].breakeven_full, 22.0)
+    # original list is unchanged
+    assert segs[0].breakeven_full == 50
+
+def test_monte_carlo_deterministic_and_bounded():
+    segs = [Segment("A", "R", 10, 20, 10, "", 15, 25),
+            Segment("B", "R", 5, 50, 30, "", 40, 60),
+            Segment("C", "R", 5, 35, 25, "", 30, 40)]
+    a = monte_carlo_at_risk(segs, 45, n=2000, seed=7)
+    b = monte_carlo_at_risk(segs, 45, n=2000, seed=7)
+    assert a == b, "same seed must give identical result"
+    # at-risk volume is between 0 and total supply, ordering p10<=p50<=p90
+    assert 0.0 <= a["p10"] <= a["p50"] <= a["p90"] <= total_supply(segs) + 1e-9
+
+def test_monte_carlo_price_monotone():
+    """Higher price => less (or equal) expected at-risk volume."""
+    segs = [Segment("A", "R", 10, 20, 10, "", 15, 25),
+            Segment("B", "R", 5, 50, 30, "", 40, 60)]
+    lo = monte_carlo_at_risk(segs, 30, n=2000, seed=3)["mean_at_risk_mmbd"]
+    hi = monte_carlo_at_risk(segs, 70, n=2000, seed=3)["mean_at_risk_mmbd"]
+    assert lo >= hi
 
 if __name__ == "__main__":
     # Collect all test functions
