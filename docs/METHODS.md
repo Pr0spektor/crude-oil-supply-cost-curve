@@ -41,6 +41,20 @@ if demand exceeds modelled supply.
 - Excel and Python outputs are cross-checked by recalculating the workbook headless
   in LibreOffice.
 
+## Carbon-cost overlay (transition lens)
+Each node carries an **upstream carbon intensity** (tCO2e/bbl, production only —
+excludes combustion Scope 3), following Masnadi et al. (2018). A carbon price adds
+`carbon_price × intensity` to each barrel and the curve is **re-ranked**, so a carbon
+price penalises high-intensity supply (oil sands, extra-heavy, high-flaring) and
+improves the relative position of low-intensity barrels — a merit-order *reshuffle*,
+not a uniform lift. `carbon.merit_order_shift` reports the rank change per node.
+
+## Validation harness
+`src/validate.py` (run in CI) asserts the data invariants — positive production,
+cash ≤ full-cycle, point estimate inside its band, cumulative continuity, sorted curve,
+at-risk + economic = total, reconciliation with total liquids, and a carbon intensity
+for every node — so a bad data edit fails loudly.
+
 ## Limitations
 Publicly-anchored, simplified (23 nodes) planning inputs — not a licensed asset-level
 database. No basis differentials (Brent/WTI/Urals) beyond notes, no time dynamics or

@@ -163,6 +163,28 @@ def test_monte_carlo_price_monotone():
     hi = monte_carlo_at_risk(segs, 70, n=2000, seed=3)["mean_at_risk_mmbd"]
     assert lo >= hi
 
+def test_carbon_overlay_adds_intensity_cost():
+    from carbon import carbon_adjusted_breakeven, intensity
+    s = Segment("Canada oil sands", "NA", 3.3, 70, 45)
+    # at $100/tCO2e a 0.11 tCO2/bbl barrel gains ~$11/bbl
+    got = carbon_adjusted_breakeven(s, 100.0)
+    assert approx(got, 70 + 100 * intensity("Canada oil sands"))
+    assert carbon_adjusted_breakeven(s, 0.0) == 70
+
+def test_carbon_curve_reranks_and_conserves_volume():
+    from carbon import carbon_adjusted_curve
+    from data import SEGMENTS
+    c0 = carbon_adjusted_curve(SEGMENTS, 0.0)
+    c1 = carbon_adjusted_curve(SEGMENTS, 150.0)
+    tot0 = sum(r["production_mmbd"] for r in c0)
+    tot1 = sum(r["production_mmbd"] for r in c1)
+    assert approx(tot0, tot1)                      # volume conserved
+    assert [r["name"] for r in c0] != [r["name"] for r in c1]  # order changes
+
+def test_validation_passes_on_shipped_data():
+    import validate
+    assert validate.checks() == []
+
 if __name__ == "__main__":
     # Collect all test functions
     test_functions = [

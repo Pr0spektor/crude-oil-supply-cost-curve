@@ -41,8 +41,13 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
 - **Uncertainty, not false precision** — every breakeven carries a (low, high) range;
   Monte-Carlo (10k seeded draws) reports P10/P50/P90 of the at-risk volume.
 - **Scenarios** — price stress and cost-inflation grid.
-- **Sourced data** — Dallas Fed, EIA, IEA, Rystad public figures ([SOURCES.md](SOURCES.md)).
+- **Carbon-cost overlay** — an upstream-carbon-intensity ($/tCO2e) lens that re-ranks
+  the merit order (transition risk), grounded in Masnadi et al. (2018).
+- **Sourced data** — Dallas Fed, EIA, IEA, Rystad, Masnadi *Science* ([SOURCES.md](SOURCES.md)).
+- **Validated** — `src/validate.py` asserts data invariants (run in CI).
 - **Synthesis** — a McKinsey-style insight memo with the "so what".
+
+![Carbon-adjusted supply cost](results/carbon_overlay.png)
 
 ## Repository layout
 ```

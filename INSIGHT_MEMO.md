@@ -23,6 +23,10 @@ $78/bbl (Arctic / frontier).
 4. **Cost inflation is a price-equivalent.** A +15% supply-chain cost shock lifts the
    marginal barrel to $90/bbl and raises at-risk volume
    at $65 to 15.3 mmb/d.
+5. **A carbon price re-ranks by intensity, not just level.** At $100/tCO2e the highest-
+   intensity barrels (oil sands ~+$11/bbl, extra-heavy ~+$12/bbl) take the biggest hit,
+   while low-intensity supply (Brazil pre-salt, low-flare Gulf) gains relative position —
+   the merit-order shift is a transition-risk signal on top of the price view.
 
 ## Implications
 - A sustained sub-$45 price threatens future supply growth far more than current output,

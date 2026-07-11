@@ -84,6 +84,23 @@ def charts():
     fig.tight_layout(); fig.savefig(os.path.join(RESULTS, "price_sensitivity.png"), dpi=120)
     plt.close(fig)
 
+    # 3b) carbon-cost overlay: base breakeven + carbon cost, ranked by carbon-adjusted cost
+    from carbon import carbon_adjusted_curve
+    cp = 100.0
+    cadj = carbon_adjusted_curve(SEGMENTS, cp)
+    names = [r["name"] for r in cadj]
+    base_c = [r["base"] for r in cadj]
+    carb = [r["carbon_cost"] for r in cadj]
+    figc, axc = plt.subplots(figsize=(10, 5))
+    y = range(len(cadj))
+    axc.barh(list(y), base_c, color="#3B6EA5", label="Full-cycle breakeven")
+    axc.barh(list(y), carb, left=base_c, color="#4F9D69", label=f"Carbon cost @ ${cp:.0f}/tCO2e")
+    axc.set_yticks(list(y)); axc.set_yticklabels(names, fontsize=7)
+    axc.invert_yaxis(); axc.set_xlabel("$/bbl"); axc.legend(loc="lower right", fontsize=8)
+    axc.set_title("Carbon-adjusted supply cost (upstream intensity), ranked")
+    figc.tight_layout(); figc.savefig(os.path.join(RESULTS, "carbon_overlay.png"), dpi=120)
+    plt.close(figc)
+
     # 3) Monte-Carlo distribution of at-risk volume at the base price
     base = PRICE_SCENARIOS["base_65"]
     import random
@@ -132,6 +149,10 @@ ${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['margina
 4. **Cost inflation is a price-equivalent.** A +15% supply-chain cost shock lifts the
    marginal barrel to ${infl['marginal_barrel_at_demand']:.0f}/bbl and raises at-risk volume
    at $65 to {infl['at_risk_at_65_full']:.1f} mmb/d.
+5. **A carbon price re-ranks by intensity, not just level.** At $100/tCO2e the highest-
+   intensity barrels (oil sands ~+$11/bbl, extra-heavy ~+$12/bbl) take the biggest hit,
+   while low-intensity supply (Brazil pre-salt, low-flare Gulf) gains relative position —
+   the merit-order shift is a transition-risk signal on top of the price view.
 
 ## Implications
 - A sustained sub-$45 price threatens future supply growth far more than current output,

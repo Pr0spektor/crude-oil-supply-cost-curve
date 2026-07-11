@@ -25,6 +25,13 @@ asset-level data. They reproduce the *shape and level* of published cost curves.
   (low, high) bracket the plausible spread for Monte-Carlo.
 - Production is apportioned to sum to ~82 mmb/d crude + condensate.
 
+## Carbon intensity
+- **Masnadi et al. (2018), "Global carbon intensity of crude oil production",
+  *Science* 361(6405):851–853** — upstream (production) carbon intensity of crude;
+  global volume-weighted average ~0.06 tCO2e/bbl, with oil sands, extra-heavy and
+  high-flaring supply at the high end. Used for the carbon-cost overlay (point values
+  illustrative).
+
 ## Explicitly NOT used
 - **Fiscal breakevens** (e.g. IMF Regional Economic Outlook) — a government-budget
   metric, different from project economics. Noted in METHODS to prevent conflation.
