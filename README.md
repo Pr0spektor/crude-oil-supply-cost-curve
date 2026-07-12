@@ -45,6 +45,8 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
   the merit order (transition risk), grounded in Masnadi et al. (2018).
 - **Sourced data** — Dallas Fed, EIA, IEA, Rystad, Masnadi *Science* ([SOURCES.md](SOURCES.md)).
 - **Validated** — `src/validate.py` asserts data invariants (run in CI).
+- **Live-data ready** — `src/fetch.py` refreshes production from the EIA open API
+  (cached, with graceful offline fallback to the bundled data; needs `EIA_API_KEY`).
 - **Synthesis** — a McKinsey-style insight memo with the "so what".
 
 ![Carbon-adjusted supply cost](results/carbon_overlay.png)

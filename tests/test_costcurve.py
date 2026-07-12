@@ -185,6 +185,15 @@ def test_validation_passes_on_shipped_data():
     import validate
     assert validate.checks() == []
 
+def test_fetch_falls_back_without_key(monkeypatch=None):
+    import os, fetch
+    os.environ.pop("EIA_API_KEY", None)
+    r = fetch.refresh_world_production()          # no key -> no network -> fallback
+    assert r["source"] == "fallback"
+    assert 70.0 < r["world_crude_mmbd"] < 105.0
+    v, src = fetch.fetch_series("world_crude_mbpd")
+    assert v is None and src == "fallback"
+
 if __name__ == "__main__":
     # Collect all test functions
     test_functions = [

@@ -66,6 +66,11 @@ SEGMENTS = [
             "Mature legacy onshore, rest of world.", 28, 48, "IEA"),
 ]
 
+def total_supply_static() -> float:
+    """Sum of bundled static production (mmb/d) — the offline fallback for fetch.py."""
+    return sum(s.production_mmbd for s in SEGMENTS)
+
+
 # Reference scenarios
 DEMAND_MMBD = 82.0        # crude + condensate demand (balances snapshot supply)
 TOTAL_LIQUIDS_2024 = 103.0  # incl. NGLs/biofuels/refinery gain (EIA STEO) — for validation
