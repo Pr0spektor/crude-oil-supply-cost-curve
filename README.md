@@ -33,7 +33,7 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
 ![Supply at risk vs price](results/price_sensitivity.png)
 ![Monte-Carlo distribution](results/monte_carlo.png)
 
-**→ One-page findings: [INSIGHT_MEMO.md](INSIGHT_MEMO.md)** (auto-generated; numbers reconcile with the model).
+**→ One-page findings: [INSIGHT_MEMO.md](INSIGHT_MEMO.md)** (produced from the model; numbers reconcile).
 
 ## What makes it decision-grade
 - **Two cost views, not conflated** — full-cycle (new-investment) vs cash cost
@@ -55,7 +55,7 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
 ```
 src/costcurve.py     # engine: curve, marginal barrel, at-risk, Monte-Carlo, inflation (stdlib)
 src/data.py          # 23 sourced supply nodes (production, full & cash breakeven, ranges)
-src/analysis.py      # charts + summary.json + auto-generated INSIGHT_MEMO.md
+src/analysis.py      # charts + summary.json + model-driven INSIGHT_MEMO.md
 src/build_workbook.py# model.xlsx: Outputs (live SUMIF) · Data · CostCurve · Scenarios · MonteCarlo
 tests/test_costcurve.py # 18 unit tests (hand-checked fixtures, seeded Monte-Carlo)
 docs/METHODS.md · SOURCES.md · INSIGHT_MEMO.md

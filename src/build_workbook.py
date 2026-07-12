@@ -144,6 +144,8 @@ def build_montecarlo(ws):
 
 def main():
     wb = Workbook()
+    wb.properties.creator = "Pr0spektor"
+    wb.properties.lastModifiedBy = "Pr0spektor"
     ws_out = wb.active; ws_out.title = "Outputs"
     ws_data = wb.create_sheet("Data"); a0, a1 = build_data(ws_data)
     build_outputs(ws_out, a0, a1)

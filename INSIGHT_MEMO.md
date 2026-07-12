@@ -1,6 +1,6 @@
 # Insight memo — Global crude-oil supply at risk
 
-*Auto-generated from the model (`python src/analysis.py`); figures reconcile with the workbook.*
+*Figures are produced directly from the model (`python src/analysis.py`) and reconcile with the workbook.*
 
 ## Situation
 Global crude + condensate supply is ~82.1 mmb/d

@@ -1,5 +1,5 @@
-"""Run the full analysis: charts, summary.json, and an auto-generated insight memo.
-Numbers in the memo are computed here so they always match the engine.
+"""Run the full analysis: charts, summary.json, and a model-driven insight memo that
+stays in sync with the data. Numbers in the memo are computed here so they match the engine.
 
 Run:  python src/analysis.py
 """
@@ -126,7 +126,7 @@ def write_memo(s):
     infl = s["cost_inflation"]["supply_chain_+15%"]
     memo = f"""# Insight memo — Global crude-oil supply at risk
 
-*Auto-generated from the model (`python src/analysis.py`); figures reconcile with the workbook.*
+*Figures are produced directly from the model (`python src/analysis.py`) and reconcile with the workbook.*
 
 ## Situation
 Global crude + condensate supply is ~{s['supply_crude_condensate_mmbd']} mmb/d
