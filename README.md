@@ -47,8 +47,8 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
 - **A model, not just a ranking** — `src/equilibrium.py` clears the market against a
   constant-elasticity demand curve, solving for the equilibrium price/volume (shift demand
   or shock costs and read the new price).
-- **Polyglot & reconciled** — the core engine is implemented in **Excel, Python and
-  JavaScript** (`js/costcurve.js`), all agreeing on the same results.
+- **Polyglot & reconciled** — the core engine is implemented in **Excel (live formulas +
+  VBA), Python, JavaScript and R**, all agreeing on the same results.
 - **Validated** — `src/validate.py` asserts data invariants (run in CI).
 - **Live-data ready** — `src/fetch.py` refreshes production from the EIA open API
   (cached, with graceful offline fallback to the bundled data; needs `EIA_API_KEY`).
@@ -62,6 +62,8 @@ src/costcurve.py     # engine: curve, marginal barrel, at-risk, Monte-Carlo, inf
 src/equilibrium.py   # market-clearing model: supply curve x demand curve -> clearing price
 src/data.py          # 23 sourced supply nodes (production, full & cash breakeven, ranges)
 js/costcurve.js      # JavaScript port of the core engine (+ js/costcurve.test.js)
+r/costcurve.R        # R port with self-test (Rscript r/costcurve.R)
+vba/CostCurve.bas    # Excel VBA module (AtRiskVolume / EconomicVolume / MarginalBarrel)
 src/analysis.py      # charts + summary.json + model-driven INSIGHT_MEMO.md
 src/build_workbook.py# model.xlsx: Outputs (live SUMIF) · Data · CostCurve · Scenarios · MonteCarlo
 tests/test_costcurve.py # 18 unit tests (hand-checked fixtures, seeded Monte-Carlo)
