@@ -185,6 +185,35 @@ def test_validation_passes_on_shipped_data():
     import validate
     assert validate.checks() == []
 
+# --- market-clearing equilibrium model ---
+_eq_fix = [Segment("A", "R", 10, 20, 10), Segment("B", "R", 5, 50, 30), Segment("C", "R", 5, 35, 25)]
+
+def test_economic_supply_steps_up_with_price():
+    from equilibrium import economic_supply
+    assert economic_supply(_eq_fix, 15) == 0
+    assert economic_supply(_eq_fix, 20) == 10
+    assert economic_supply(_eq_fix, 35) == 15
+    assert economic_supply(_eq_fix, 60) == 20
+
+def test_demand_decreasing_in_price():
+    from equilibrium import demand
+    hi = demand(40, 100, 50, 0.1); lo = demand(60, 100, 50, 0.1)
+    assert hi > lo
+    assert approx(demand(50, 100, 50, 0.1), 100)          # at ref price, demand = ref qty
+
+def test_market_clears_supply_meets_demand():
+    from equilibrium import clear_market, economic_supply, demand
+    r = clear_market(_eq_fix, ref_quantity=12, ref_price=35, elasticity=0.08)
+    assert r["cleared"] and approx(r["price"], 35, abs_=0.2)
+    # economic supply at the clearing price covers demand
+    assert economic_supply(_eq_fix, r["price"]) + 1e-6 >= r["quantity"]
+
+def test_higher_demand_raises_clearing_price():
+    from equilibrium import clear_market
+    lo = clear_market(_eq_fix, 12, 35, 0.08)["price"]
+    hi = clear_market(_eq_fix, 18, 35, 0.08)["price"]
+    assert hi > lo
+
 def test_fetch_falls_back_without_key(monkeypatch=None):
     import os, fetch
     os.environ.pop("EIA_API_KEY", None)
