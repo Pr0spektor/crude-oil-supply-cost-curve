@@ -8,6 +8,8 @@ at a given oil price, with Monte-Carlo uncertainty, cost-inflation scenarios, an
 written insight memo. Implemented as an **interactive Excel workbook** (live SUMIF)
 and an **auditable, unit-tested Python engine** that agree exactly.
 
+[![ci](https://github.com/Pr0spektor/crude-oil-supply-cost-curve/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Pr0spektor/crude-oil-supply-cost-curve/actions/workflows/ci.yml)
+
 Author: **[Pr0spektor](https://github.com/Pr0spektor)**
 
 ---
