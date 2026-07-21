@@ -20,4 +20,5 @@ jobs:
       - run: pytest -q
       - run: node js/costcurve.test.js
       - run: Rscript r/costcurve.R
-      - run: python src/analysis.py && python src/build_workbook.py
+      - run: python src/analysis.py
+      - run: python src/strip_meta.py && python src/build_workbook.py

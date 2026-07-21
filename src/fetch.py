@@ -65,12 +65,32 @@ def _http_get(url: str, timeout: float = 15.0):
         return None
 
 
+
+def _key_from_env_or_dotenv():
+    """The EIA key, from the environment or from a local .env file.
+
+    Never stored in the repository: .env is git-ignored and .env.example ships empty.
+    Returns None when absent, which makes the caller fall back to the bundled data.
+    """
+    k = os.environ.get("EIA_API_KEY")
+    if k:
+        return k.strip() or None
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = os.path.join(root, ".env")
+    if os.path.exists(env):
+        for line in open(env):
+            line = line.strip()
+            if line.startswith("EIA_API_KEY=") and not line.startswith("#"):
+                return line.split("=", 1)[1].strip().strip('"\'') or None
+    return None
+
+
 def fetch_series(key: str, api_key: str | None = None):
     """Return (value, source) where source in {'cache','live','fallback'}."""
     cached = _read_cache(key)
     if cached is not None:
         return cached.get("value"), "cache"
-    api_key = api_key or os.environ.get("EIA_API_KEY")
+    api_key = api_key or _key_from_env_or_dotenv()
     spec = SERIES.get(key)
     if not api_key or spec is None:
         return None, "fallback"

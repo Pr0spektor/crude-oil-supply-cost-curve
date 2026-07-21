@@ -12,6 +12,36 @@ Author: **[Pr0spektor](https://github.com/Pr0spektor)**
 
 ---
 
+## Running it — data and API keys
+
+**Clone and run. No key, no account, no signup.** Every figure and every number in
+[INSIGHT_MEMO.md](INSIGHT_MEMO.md) comes from the sourced dataset bundled in `src/data.py`,
+so the published result is auditable by anyone without credentials:
+
+```bash
+git clone https://github.com/Pr0spektor/crude-oil-supply-cost-curve.git
+cd crude-oil-supply-cost-curve
+pip install -r requirements.txt
+python tests/test_costcurve.py     # 26 tests
+python src/analysis.py             # charts + results/summary.json + INSIGHT_MEMO.md
+```
+
+**To refresh prices from the live EIA feed**, supply your own key — the repo never ships one:
+
+| Source | Key needed? | How to get it |
+|---|---|---|
+| Bundled breakeven dataset (`src/data.py`, 23 sourced nodes) | no | in the repo, with citations in [SOURCES.md](SOURCES.md) |
+| **EIA** — live crude price series | yes, free | instant registration at [eia.gov/opendata/register.php](https://www.eia.gov/opendata/register.php) |
+
+```bash
+cp .env.example .env      # then paste your key into EIA_API_KEY
+python src/fetch.py       # or one-off: EIA_API_KEY=... python src/fetch.py
+```
+
+`.env` is git-ignored; `.env.example` ships empty. `src/fetch.py` reads the key from the
+environment or from `.env`, and falls back to the bundled dataset whenever a key is absent
+or the network is unavailable — nothing here can break for want of a credential.
+
 ## The question it answers
 *"Oil falls to $40/bbl — how much supply is underwater, which segment sets the
 marginal price, and where does new investment stop making sense?"* — read straight
