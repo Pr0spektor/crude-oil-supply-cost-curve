@@ -47,7 +47,7 @@ or the network is unavailable, so nothing here can break for want of a credentia
 marginal price, and where does new investment stop making sense?"* — read straight
 off the curve, with the uncertainty around the answer made explicit.
 
-## Headline results (23 publicly-anchored nodes, ~82 mmb/d crude + condensate)
+## Headline results (23 publicly-anchored nodes, ≈82 mmb/d crude + condensate)
 
 | Oil price | New-investment at risk (full-cycle) | Shut-in risk (cash) | Full-cycle P10–P90 (Monte-Carlo) |
 |---|---|---|---|
@@ -55,8 +55,8 @@ off the curve, with the uncertainty around the answer made explicit.
 | **$65** | 4.1 mmb/d (5%) | 0 | 4.1 – 11.1 |
 | **$85** | 0 | 0 | 0 – 0.8 |
 
-Marginal barrel to clear ~82 mmb/d demand ≈ **$78/bbl** (Arctic/frontier). A **+15%**
-cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15 mmb/d.
+Marginal barrel to clear ≈82 mmb/d demand ≈ **$78/bbl** (Arctic/frontier). A **+15%**
+cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ≈15 mmb/d.
 *US-shale nodes use Dallas Fed Q1 2025 breakevens ($61–63 new well; $33–41 shut-in).*
 
 ![Supply cost curve with uncertainty](results/supply_cost_curve.png)

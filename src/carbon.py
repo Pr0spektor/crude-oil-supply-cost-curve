@@ -8,7 +8,7 @@ i.e. it reshuffles the merit order, not just lifts it uniformly.
 
 Intensities are upstream tCO2e/bbl, following the ranges in Masnadi et al. (2018),
 "Global carbon intensity of crude oil production", *Science* 361:851 (volume-weighted
-global average ~0.06 tCO2e/bbl upstream; oil sands / extra-heavy / heavy-flaring at
+global average ≈0.06 tCO2e/bbl upstream; oil sands / extra-heavy / heavy-flaring at
 the high end). Illustrative point values — see SOURCES.md.
 """
 from __future__ import annotations

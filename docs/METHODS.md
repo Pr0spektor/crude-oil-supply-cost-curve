@@ -34,7 +34,7 @@ last barrel needed to meet demand — the market-clearing cost — and flags a s
 if demand exceeds modelled supply.
 
 ## Validation
-- Modelled crude + condensate (~82 mmb/d) reconciles with total liquids (~103 mmb/d,
+- Modelled crude + condensate (≈82 mmb/d) reconciles with total liquids (≈103 mmb/d,
   EIA STEO) once NGLs, biofuels and refinery gain are added.
 - Curve **shape and ordering** match published cost curves (Middle East cheapest;
   oil sands / Arctic most expensive; US shale mid-curve at the Dallas-Fed level).

@@ -22,7 +22,7 @@ def economic_supply(segments: Sequence[Segment], price: float, cost: str = "full
 def demand(price: float, ref_quantity: float, ref_price: float, elasticity: float) -> float:
     """Constant-elasticity demand: Q = Qref * (P/Pref)^(-|elasticity|).
 
-    Short-run oil demand is very inelastic (|elasticity| ~ 0.05-0.10).
+    Short-run oil demand is very inelastic (|elasticity| ≈ 0.05-0.10).
     """
     e = abs(elasticity)
     if price <= 0:

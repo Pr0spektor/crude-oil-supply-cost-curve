@@ -129,16 +129,16 @@ def write_memo(s):
 *Figures are produced directly from the model (`python src/analysis.py`) and reconcile with the workbook.*
 
 ## Situation
-Global crude + condensate supply is ~{s['supply_crude_condensate_mmbd']} mmb/d
-(part of ~{s['total_liquids_ref_mmbd']} mmb/d total liquids). Ranking it cheapest-first
+Global crude + condensate supply is ≈{s['supply_crude_condensate_mmbd']} mmb/d
+(part of ≈{s['total_liquids_ref_mmbd']} mmb/d total liquids). Ranking it cheapest-first
 on full-cycle economic breakeven produces the supply cost curve. To clear demand of
-~{s['demand_mmbd']:.0f} mmb/d the marginal barrel costs about
+≈{s['demand_mmbd']:.0f} mmb/d the marginal barrel costs about
 ${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['marginal_segment']}).
 
 ## Key findings
 1. **The market is cost-segmented.** Middle East onshore clears well below $30/bbl,
-   Brazil pre-salt is a low-cost deepwater outlier (~$35), US shale sits mid-curve
-   (~$61–63, Dallas Fed Q1'25), and oil sands / Arctic anchor the high end ($70–78).
+   Brazil pre-salt is a low-cost deepwater outlier (≈$35), US shale sits mid-curve
+   (≈$61–63, Dallas Fed Q1'25), and oil sands / Arctic anchor the high end ($70–78).
 2. **Full-cycle vs cash cost are very different risks.** At ${stress['price']:.0f}/bbl,
    {stress['full_cycle']['at_risk_mmbd']:.1f} mmb/d ({stress['full_cycle']['at_risk_share']*100:.0f}%)
    cannot justify **new** investment, but only {stress['cash']['at_risk_mmbd']:.1f} mmb/d is
@@ -150,7 +150,7 @@ ${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['margina
    marginal barrel to ${infl['marginal_barrel_at_demand']:.0f}/bbl and raises at-risk volume
    at $65 to {infl['at_risk_at_65_full']:.1f} mmb/d.
 5. **A carbon price re-ranks by intensity, not just level.** At $100/tCO2e the highest-
-   intensity barrels (oil sands ~+$11/bbl, extra-heavy ~+$12/bbl) take the biggest hit,
+   intensity barrels (oil sands ≈+$11/bbl, extra-heavy ≈+$12/bbl) take the biggest hit,
    while low-intensity supply (Brazil pre-salt, low-flare Gulf) gains relative position —
    the merit-order shift is a transition-risk signal on top of the price view.
 

@@ -1,7 +1,7 @@
-"""Global crude + condensate supply nodes (~82 mmb/d), grounded in public sources.
+"""Global crude + condensate supply nodes (≈82 mmb/d), grounded in public sources.
 
 Production is a recent snapshot of crude + condensate output (total *liquids*
-including NGLs/biofuels is ~103 mmb/d — see validation in analysis.py). Full-cycle
+including NGLs/biofuels is ≈103 mmb/d — see validation in analysis.py). Full-cycle
 breakevens are *economic* breakevens (price to sanction new supply); cash costs are
 half-cycle shut-in prices. Ranges (low, high) express uncertainty for Monte-Carlo.
 
