@@ -1,10 +1,10 @@
 # crude-oil-supply-cost-curve
 
-**Global crude-oil supply cost curve — breakeven benchmarking with uncertainty.**
+**Global crude-oil supply cost curve: breakeven benchmarking with uncertainty.**
 An energy-market analytical tool that ranks world crude + condensate supply by
 *economic* breakeven ($/bbl), builds the cumulative supply cost curve, finds the
 marginal barrel that clears demand, and quantifies how much production is uneconomic
-at a given oil price — with Monte-Carlo uncertainty, cost-inflation scenarios, and a
+at a given oil price, with Monte-Carlo uncertainty, cost-inflation scenarios, and a
 written insight memo. Implemented as an **interactive Excel workbook** (live SUMIF)
 and an **auditable, unit-tested Python engine** that agree exactly.
 
@@ -12,7 +12,7 @@ Author: **[Pr0spektor](https://github.com/Pr0spektor)**
 
 ---
 
-## Running it — data and API keys
+## Running it: data and API keys
 
 **Clone and run. No key, no account, no signup.** Every figure and every number in
 [INSIGHT_MEMO.md](INSIGHT_MEMO.md) comes from the sourced dataset bundled in `src/data.py`,
@@ -26,12 +26,12 @@ python tests/test_costcurve.py     # 26 tests
 python src/analysis.py             # charts + results/summary.json + INSIGHT_MEMO.md
 ```
 
-**To refresh prices from the live EIA feed**, supply your own key — the repo never ships one:
+**To refresh prices from the live EIA feed**, supply your own key. The repo never ships one:
 
 | Source | Key needed? | How to get it |
 |---|---|---|
 | Bundled breakeven dataset (`src/data.py`, 23 sourced nodes) | no | in the repo, with citations in [SOURCES.md](SOURCES.md) |
-| **EIA** — live crude price series | yes, free | instant registration at [eia.gov/opendata/register.php](https://www.eia.gov/opendata/register.php) |
+| **EIA**, live crude price series | yes, free | instant registration at [eia.gov/opendata/register.php](https://www.eia.gov/opendata/register.php) |
 
 ```bash
 cp .env.example .env      # then paste your key into EIA_API_KEY
@@ -40,7 +40,7 @@ python src/fetch.py       # or one-off: EIA_API_KEY=... python src/fetch.py
 
 `.env` is git-ignored; `.env.example` ships empty. `src/fetch.py` reads the key from the
 environment or from `.env`, and falls back to the bundled dataset whenever a key is absent
-or the network is unavailable — nothing here can break for want of a credential.
+or the network is unavailable, so nothing here can break for want of a credential.
 
 ## The question it answers
 *"Oil falls to $40/bbl — how much supply is underwater, which segment sets the
@@ -66,23 +66,23 @@ cost shock lifts the marginal barrel to **$90** and at-risk volume at $65 to ~15
 **→ One-page findings: [INSIGHT_MEMO.md](INSIGHT_MEMO.md)** (produced from the model; numbers reconcile).
 
 ## What makes it decision-grade
-- **Two cost views, not conflated** — full-cycle (new-investment) vs cash cost
+- **Two cost views, not conflated.** Full-cycle (new-investment) vs cash cost
   (shut-in), and *fiscal* breakeven explicitly excluded. See [docs/METHODS.md](docs/METHODS.md).
-- **Uncertainty, not false precision** — every breakeven carries a (low, high) range;
+- **Uncertainty, not false precision.** Every breakeven carries a (low, high) range;
   Monte-Carlo (10k seeded draws) reports P10/P50/P90 of the at-risk volume.
-- **Scenarios** — price stress and cost-inflation grid.
-- **Carbon-cost overlay** — an upstream-carbon-intensity ($/tCO2e) lens that re-ranks
+- **Scenarios.** Price stress and cost-inflation grid.
+- **Carbon-cost overlay.** An upstream-carbon-intensity ($/tCO2e) lens that re-ranks
   the merit order (transition risk), grounded in Masnadi et al. (2018).
-- **Sourced data** — Dallas Fed, EIA, IEA, Rystad, Masnadi *Science* ([SOURCES.md](SOURCES.md)).
-- **A model, not just a ranking** — `src/equilibrium.py` clears the market against a
+- **Sourced data.** Dallas Fed, EIA, IEA, Rystad, Masnadi *Science* ([SOURCES.md](SOURCES.md)).
+- **A model, not just a ranking.** `src/equilibrium.py` clears the market against a
   constant-elasticity demand curve, solving for the equilibrium price/volume (shift demand
   or shock costs and read the new price).
-- **Polyglot & reconciled** — the core engine is implemented in **Excel (live formulas +
+- **Polyglot and reconciled.** The core engine is implemented in **Excel (live formulas +
   VBA), Python, JavaScript and R**, all agreeing on the same results.
-- **Validated** — `src/validate.py` asserts data invariants (run in CI).
-- **Live-data ready** — `src/fetch.py` refreshes production from the EIA open API
+- **Validated.** `src/validate.py` asserts data invariants (run in CI).
+- **Live-data ready.** `src/fetch.py` refreshes production from the EIA open API
   (cached, with graceful offline fallback to the bundled data; needs `EIA_API_KEY`).
-- **Synthesis** — a McKinsey-style insight memo with the "so what".
+- **Synthesis.** A McKinsey-style insight memo with the "so what".
 
 ![Carbon-adjusted supply cost](results/carbon_overlay.png)
 
@@ -107,12 +107,12 @@ python src/build_workbook.py  # interactive model.xlsx
 python tests/test_costcurve.py   # 18/18, standalone …
 pytest -q                        # … or under pytest (CI)
 ```
-Open **`model.xlsx`**, change the oil-price cell on **Outputs** — at-risk volumes
+Open **`model.xlsx`**, change the oil-price cell on **Outputs**, and at-risk volumes
 recompute via `SUMIF` (no macros). Verified by recalculating headless in LibreOffice.
 
 ## Caveats
-Publicly-anchored, simplified (23-node) planning inputs — not a licensed asset-level
+Publicly-anchored, simplified (23-node) planning inputs, not a licensed asset-level
 database, not investment advice. See METHODS/SOURCES for full provenance and limits.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
