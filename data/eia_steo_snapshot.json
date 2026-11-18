@@ -1,0 +1,223 @@
+{
+ "_meta": {
+  "fetched_at": "2026-11-18T16:20:23+00:00",
+  "source": "EIA bulk archive https://api.eia.gov/bulk/STEO.zip",
+  "tool": "tools/refresh_eia.py"
+ },
+ "series": [
+  {
+   "anchor": "crude",
+   "eia_name": "Total World Crude Oil Production, Monthly",
+   "id": "STEO.COPR_WORLD.M",
+   "label": "World crude oil production",
+   "last_historical_period": "202607",
+   "observations": [
+    {
+     "period": "202712",
+     "value": 82.15478135
+    },
+    {
+     "period": "202711",
+     "value": 82.16743112
+    },
+    {
+     "period": "202710",
+     "value": 81.64701399
+    },
+    {
+     "period": "202709",
+     "value": 81.27943498
+    },
+    {
+     "period": "202708",
+     "value": 81.1923429
+    },
+    {
+     "period": "202707",
+     "value": 81.17267942
+    },
+    {
+     "period": "202706",
+     "value": 80.60723827
+    },
+    {
+     "period": "202705",
+     "value": 80.75357674
+    },
+    {
+     "period": "202704",
+     "value": 80.24453111
+    },
+    {
+     "period": "202703",
+     "value": 79.85748081
+    },
+    {
+     "period": "202702",
+     "value": 79.75849008
+    },
+    {
+     "period": "202701",
+     "value": 79.53394908
+    },
+    {
+     "period": "202612",
+     "value": 79.47806181
+    },
+    {
+     "period": "202611",
+     "value": 79.34249457
+    },
+    {
+     "period": "202610",
+     "value": 78.68999349
+    },
+    {
+     "period": "202609",
+     "value": 77.72763209
+    },
+    {
+     "period": "202608",
+     "value": 75.17379404
+    },
+    {
+     "period": "202607",
+     "value": 76.027931
+    },
+    {
+     "period": "202606",
+     "value": 74.027622
+    },
+    {
+     "period": "202605",
+     "value": 69.710126
+    },
+    {
+     "period": "202604",
+     "value": 71.032777
+    },
+    {
+     "period": "202603",
+     "value": 72.024003
+    },
+    {
+     "period": "202602",
+     "value": 81.214808
+    },
+    {
+     "period": "202601",
+     "value": 79.173675
+    }
+   ],
+   "unit": "million barrels per day",
+   "vintage": "2026-11-10T17:02:09-05:00"
+  },
+  {
+   "anchor": null,
+   "eia_name": "Liquid Fuels Consumption, Total World, Monthly",
+   "id": "STEO.PATC_WORLD.M",
+   "label": "World liquid fuels consumption",
+   "last_historical_period": "202412",
+   "observations": [
+    {
+     "period": "202712",
+     "value": 106.0320692
+    },
+    {
+     "period": "202711",
+     "value": 104.9227872
+    },
+    {
+     "period": "202710",
+     "value": 104.0828401
+    },
+    {
+     "period": "202709",
+     "value": 105.2547586
+    },
+    {
+     "period": "202708",
+     "value": 105.1058985
+    },
+    {
+     "period": "202707",
+     "value": 105.3229513
+    },
+    {
+     "period": "202706",
+     "value": 105.4157948
+    },
+    {
+     "period": "202705",
+     "value": 103.8372025
+    },
+    {
+     "period": "202704",
+     "value": 103.7089474
+    },
+    {
+     "period": "202703",
+     "value": 102.817166
+    },
+    {
+     "period": "202702",
+     "value": 104.0467486
+    },
+    {
+     "period": "202701",
+     "value": 101.7145739
+    },
+    {
+     "period": "202612",
+     "value": 104.6922009
+    },
+    {
+     "period": "202611",
+     "value": 103.5342378
+    },
+    {
+     "period": "202610",
+     "value": 102.7796338
+    },
+    {
+     "period": "202609",
+     "value": 104.0539004
+    },
+    {
+     "period": "202608",
+     "value": 103.3624184
+    },
+    {
+     "period": "202607",
+     "value": 101.6714161
+    },
+    {
+     "period": "202606",
+     "value": 101.675491
+    },
+    {
+     "period": "202605",
+     "value": 98.93177652
+    },
+    {
+     "period": "202604",
+     "value": 99.394784
+    },
+    {
+     "period": "202603",
+     "value": 101.9713079
+    },
+    {
+     "period": "202602",
+     "value": 104.3320501
+    },
+    {
+     "period": "202601",
+     "value": 102.310745
+    }
+   ],
+   "unit": "million barrels per day",
+   "vintage": "2026-11-10T17:02:09-05:00"
+  }
+ ]
+}

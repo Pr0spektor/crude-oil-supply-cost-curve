@@ -1,17 +1,19 @@
 {
-  "_note": "EIA re-issues STEO series between vintages, so IDs live here rather than in code. Confirm them once with: python tools/refresh_eia.py --list-series 'world crude'  (needs EIA_API_KEY), then paste the IDs below. An empty id is skipped with a warning rather than silently returning nothing.",
+  "_note": "Series IDs confirmed against the bulk archive (https://api.eia.gov/bulk/STEO.zip) on 2026-11-18 by scanning STEO.txt for monthly series whose names match. Re-confirm with: python tools/refresh_eia.py --list-series 'world crude'",
   "series": [
     {
-      "id": "",
+      "id": "STEO.COPR_WORLD.M",
       "label": "World crude oil production",
       "unit": "million barrels per day",
-      "search": "world crude oil production"
+      "search": "world crude oil production",
+      "anchor": "crude"
     },
     {
-      "id": "",
+      "id": "STEO.PATC_WORLD.M",
       "label": "World liquid fuels consumption",
       "unit": "million barrels per day",
-      "search": "world liquid fuels consumption"
+      "search": "liquid fuels consumption world",
+      "anchor": null
     }
   ]
 }

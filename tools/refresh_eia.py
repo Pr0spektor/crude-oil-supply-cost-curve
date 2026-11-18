@@ -1,34 +1,35 @@
 #!/usr/bin/env python3
-"""Refresh the EIA STEO snapshot behind the demand anchor.
+"""Refresh the EIA STEO snapshot from the bulk file — no API key required.
 
-The model's demand curve is anchored on published refinery runs and crude demand. Those
-numbers live in ``src/data.py`` and ``src/demand.py`` as constants, which is reproducible
-but silent about age. This tool fetches the current STEO vintage, writes it to
-``data/eia_steo_snapshot.json`` and reports how far the anchor has moved.
+EIA publishes the whole Short-Term Energy Outlook as a static archive at
+``https://api.eia.gov/bulk/STEO.zip`` (18 MB of JSON-lines). It is a plain file download,
+not an API call, so there is no key, no rate limit and no registration step. The v2 REST
+API gives the same numbers with a key and a 5 000-request/hour budget; for a monthly
+refresh the bulk file is simply better.
 
-    python tools/refresh_eia.py --check 120     # CI: fail if the snapshot is older than 120 days
-    python tools/refresh_eia.py --write         # fetch and write
-    python tools/refresh_eia.py --write --dry-run
+    python tools/refresh_eia.py --list-series "crude"   # find a series id, offline
+    python tools/refresh_eia.py --write                 # fetch, validate, write snapshot
+    python tools/refresh_eia.py --check 150             # age gate, used in CI
 
-Configuration
--------------
-Series IDs live in ``tools/eia_series.json`` rather than in code, because EIA re-issues
-STEO series between vintages and a hardcoded ID that silently returns nothing is worse than
-a config file a human can edit. Each entry is ``{"id": ..., "label": ..., "unit": ...}``.
-Find or confirm an ID in the EIA browser: https://www.eia.gov/opendata/browser/steo
+What it writes: ``data/eia_steo_snapshot.json`` with the newest 24 monthly observations per
+configured series, the vintage (STEO's ``last_updated``), and how far the newest
+consumption print sits from the model's demand anchor. A drift above about 1 mmb/d is the
+signal to re-anchor the curve rather than to trust the old number.
 
-No key, no write: ``EIA_API_KEY`` is required, and without it the tool reports the age of
-the snapshot and exits 0 so a missing secret never turns into a red build.
+Series IDs live in ``tools/eia_series.json`` because EIA re-issues them between vintages.
+An unset id is skipped with a warning instead of silently returning nothing.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
+import io
 import json
 import os
 import sys
-import urllib.parse
+import tempfile
 import urllib.request
+import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
@@ -36,20 +37,16 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 DATA = os.path.join(ROOT, "data")
 SNAPSHOT = os.path.join(DATA, "eia_steo_snapshot.json")
 CONFIG = os.path.join(ROOT, "tools", "eia_series.json")
-API = "https://api.eia.gov/v2/steo/data/"
-TIMEOUT = 45
+BULK = "https://api.eia.gov/bulk/STEO.zip"
+TIMEOUT = 300
+KEEP = 24
 
-# Plausible ranges used to reject a payload before it is written. World crude + condensate
-# supply has sat between 70 and 90 mmb/d for two decades; anything outside that is a unit or
-# facet error, not a market move.
+# World crude + condensate supply has sat between 60 and 110 mmb/d for two decades; anything
+# outside that is a unit or facet error, not a market move.
 PLAUSIBLE_MMBD = (60.0, 110.0)
 
 
-def api_key() -> str | None:
-    return (os.environ.get("EIA_API_KEY") or "").strip() or None
-
-
-def series() -> list[dict]:
+def series_config() -> list[dict]:
     with open(CONFIG) as f:
         return json.load(f)["series"]
 
@@ -58,56 +55,73 @@ def age_days() -> int | None:
     if not os.path.exists(SNAPSHOT):
         return None
     with open(SNAPSHOT) as f:
-        meta = json.load(f).get("_meta", {})
-    stamp = meta.get("fetched_at")
+        stamp = json.load(f).get("_meta", {}).get("fetched_at")
     if not stamp:
         return None
     return (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(stamp)).days
 
 
-def list_series(needle: str) -> int:
-    """Print STEO series whose name contains ``needle`` so an ID can be confirmed once."""
-    key = api_key()
-    if not key:
-        print("EIA_API_KEY is not set")
-        return 1
-    url = ("https://api.eia.gov/v2/steo/facet/seriesId/?api_key=" + urllib.parse.quote(key)
-           + "&length=5000")
-    with urllib.request.urlopen(url, timeout=TIMEOUT) as r:
-        payload = json.loads(r.read().decode())
-    facets = payload.get("response", {}).get("facets", [])
-    hits = [f for f in facets if needle.lower() in (f.get("name") or "").lower()]
-    for f in hits[:60]:
-        print(f"{f.get('id')}\t{f.get('name')}")
-    print(f"{len(hits)} match(es) for {needle!r}")
+def _lines(handle):
+    for raw in handle:
+        raw = raw.strip()
+        if raw:
+            yield json.loads(raw)
+
+
+def download_bulk() -> str:
+    """Fetch the archive once and return the path to the extracted JSON-lines file."""
+    tmp = tempfile.mkdtemp(prefix="steo-")
+    archive = os.path.join(tmp, "STEO.zip")
+    urllib.request.urlretrieve(BULK, archive)
+    with zipfile.ZipFile(archive) as z:
+        name = next(n for n in z.namelist() if n.lower().endswith(".txt"))
+        z.extract(name, tmp)
+        return os.path.join(tmp, name)
+
+
+def list_series(path: str, needle: str) -> int:
+    hits = 0
+    with io.open(path, encoding="utf-8") as f:
+        for d in _lines(f):
+            if needle.lower() in (d.get("name") or "").lower() and d.get("f") == "M":
+                print(f"{d['series_id']}\t{d['name']}\t{d.get('units')}")
+                hits += 1
+                if hits >= 80:
+                    print("... truncated")
+                    break
+    print(f"{hits} monthly match(es) for {needle!r}")
     return 0
 
 
-def fetch(entry: dict) -> dict:
-    params = {
-        "api_key": api_key(),
-        "frequency": "monthly",
-        "data[0]": "value",
-        "facets[seriesId][]": entry["id"],
-        "sort[0][column]": "period",
-        "sort[0][direction]": "desc",
-        "length": "24",
-    }
-    url = API + "?" + urllib.parse.urlencode(params)
-    with urllib.request.urlopen(url, timeout=TIMEOUT) as r:
-        payload = json.loads(r.read().decode())
-    rows = (payload.get("response") or {}).get("data") or []
-    if not rows:
-        raise RuntimeError(f"series {entry['id']} returned no rows")
-    return {
-        "id": entry["id"],
-        "label": entry.get("label", entry["id"]),
-        "unit": entry.get("unit", ""),
-        "observations": [
-            {"period": row["period"], "value": float(row["value"])}
-            for row in rows if row.get("value") not in (None, "")
-        ],
-    }
+def extract(path: str, wanted: dict[str, dict]) -> list[dict]:
+    """Pull the configured series out of the archive in one pass."""
+    found: dict[str, dict] = {}
+    with io.open(path, encoding="utf-8") as f:
+        for d in _lines(f):
+            sid = d.get("series_id")
+            if sid in wanted and sid not in found:
+                found[sid] = d
+            if len(found) == len(wanted):
+                break
+    out = []
+    for sid, entry in wanted.items():
+        d = found.get(sid)
+        if not d:
+            raise RuntimeError(f"series {sid} not found in the bulk archive")
+        rows = [[p, float(v)] for p, v in (d.get("data") or []) if v not in (None, "")]
+        if not rows:
+            raise RuntimeError(f"series {sid} has no observations")
+        out.append({
+            "id": sid,
+            "label": entry.get("label") or d.get("name"),
+            "anchor": entry.get("anchor"),
+            "eia_name": d.get("name"),
+            "unit": d.get("units", ""),
+            "vintage": d.get("last_updated"),
+            "last_historical_period": d.get("lastHistoricalPeriod"),
+            "observations": [{"period": p, "value": v} for p, v in rows[:KEEP]],
+        })
+    return out
 
 
 def validate(payload: dict) -> list[str]:
@@ -117,30 +131,39 @@ def validate(payload: dict) -> list[str]:
         if not obs:
             problems.append(f"{s['id']}: no observations")
             continue
-        if s.get("unit", "").startswith("million barrels") or "mmbd" in s.get("unit", ""):
+        if "million barrels per day" in s.get("unit", ""):
             lo, hi = PLAUSIBLE_MMBD
             bad = [o for o in obs if not lo <= o["value"] <= hi]
             if bad:
                 problems.append(f"{s['id']}: {bad[0]['value']} outside {lo}..{hi} mmb/d")
-        if obs != sorted(obs, key=lambda o: o["period"], reverse=True):
+        periods = [o["period"] for o in obs]
+        if periods != sorted(periods, reverse=True):
             problems.append(f"{s['id']}: observations not newest-first")
+        if len(set(periods)) != len(periods):
+            problems.append(f"{s['id']}: duplicate periods")
     return problems
 
 
 def anchor_drift(payload: dict) -> list[str]:
-    """Compare the newest STEO demand observation with the model's anchor."""
+    """Compare the newest consumption print with the model's demand anchor."""
     try:
         import demand as dm
     except Exception:
         return []
+    anchor = getattr(dm, "ANCHOR_MMBD", None)
+    if anchor is None:
+        return []
     notes = []
     for s in payload.get("series", []):
-        if "consumption" not in s.get("label", "").lower():
+        if s.get("anchor") != "crude":
             continue
         latest = s["observations"][0]
-        diff = latest["value"] - dm.ANCHOR_MMBD
+        diff = latest["value"] - anchor
         notes.append(f"{s['label']}: STEO {latest['period']} = {latest['value']:.2f} mmb/d, "
-                     f"model anchor {dm.ANCHOR_MMBD:.2f} (diff {diff:+.2f})")
+                     f"model anchor {anchor:.2f} (diff {diff:+.2f})")
+    if not notes:
+        notes.append("no series is flagged to compare with the anchor "
+                     "(add \"anchor\": \"crude\" in tools/eia_series.json)")
     return notes
 
 
@@ -150,37 +173,38 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--check", type=int, metavar="DAYS", default=0)
     ap.add_argument("--list-series", metavar="NEEDLE",
-                    help="print STEO series whose name matches, then exit")
+                    help="print monthly STEO series whose name matches, then exit")
     args = ap.parse_args()
 
     if args.list_series:
-        return list_series(args.list_series)
+        return list_series(download_bulk(), args.list_series)
 
     age = age_days()
     print(f"snapshot: {os.path.relpath(SNAPSHOT, ROOT) if os.path.exists(SNAPSHOT) else 'none'} "
           f"({age if age is not None else '?'} days old)")
-
     if args.check and age is not None and age > args.check:
         print(f"FAIL: snapshot is {age} days old, limit {args.check}")
         return 1
     if not (args.write or args.dry_run):
         return 0
-    if not api_key():
-        print("EIA_API_KEY is not set — nothing fetched. Get one at https://www.eia.gov/opendata/register.php")
-        return 0
 
-    payload = {"_meta": {"fetched_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-                         "source": "EIA API v2, STEO", "tool": "tools/refresh_eia.py"},
-               "series": []}
-    for entry in series():
-        if not entry.get("id"):
-            print(f"skipping {entry.get('label')!r}: no series id configured "
-                  f"(run --list-series {entry.get('search', '')!r})")
-            continue
-        payload["series"].append(fetch(entry))
-    if not payload["series"]:
-        print("nothing to write: configure at least one series id in tools/eia_series.json")
-        return 0
+    wanted = {e["id"]: e for e in series_config() if e.get("id")}
+    skipped = [e for e in series_config() if not e.get("id")]
+    for e in skipped:
+        print(f"skipping {e.get('label')!r}: no series id configured")
+    if not wanted:
+        print("nothing to fetch: configure series ids in tools/eia_series.json")
+        return 1
+
+    path = download_bulk()
+    payload = {
+        "_meta": {
+            "fetched_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+            "source": "EIA bulk archive https://api.eia.gov/bulk/STEO.zip",
+            "tool": "tools/refresh_eia.py",
+        },
+        "series": extract(path, wanted),
+    }
 
     problems = validate(payload)
     if problems:
@@ -189,8 +213,19 @@ def main() -> int:
             print("  -", p)
         return 1
 
+    for s in payload["series"]:
+        latest = s["observations"][0]
+        print(f"{s['id']}: {latest['period']} = {latest['value']:.2f} {s['unit']} "
+              f"(vintage {s['vintage']}, last historical {s['last_historical_period']})")
     for note in anchor_drift(payload):
         print("anchor:", note)
+    for s in payload["series"]:
+        if s.get("anchor") != "crude" and "consumption" in (s.get("eia_name") or "").lower():
+            latest = s["observations"][0]
+            print(f"context: {s['label']} is total liquids, {latest['value']:.2f} mmb/d in "
+                  f"{latest['period']} — it includes NGLs, biofuels and processing gains and is "
+                  f"not the crude anchor")
+
     if args.dry_run:
         print("dry run: nothing written")
         return 0

@@ -22,8 +22,6 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Refresh the STEO snapshot
-        env:
-          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
         run: python tools/refresh_eia.py --write
       - name: Fail if the snapshot is older than 150 days
         run: python tools/refresh_eia.py --check 150
@@ -35,9 +33,9 @@ jobs:
           body: |
             Automated refresh of the STEO snapshot behind the demand anchor.
 
-            Series IDs are configured in `tools/eia_series.json`. Without `EIA_API_KEY`
-            the job reports the snapshot age and exits cleanly, then the age gate fails
-            once the snapshot passes 150 days.
+            The bulk archive at api.eia.gov/bulk/STEO.zip is a static file download, so this
+            job needs no secret. Series IDs are configured in `tools/eia_series.json`; the
+            age gate fails once the snapshot passes 150 days.
           branch: data-refresh/eia
           delete-branch: true
           add-paths: data/eia_steo_snapshot.json

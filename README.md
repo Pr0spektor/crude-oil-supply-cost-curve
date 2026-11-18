@@ -138,16 +138,21 @@ MIT. See [LICENSE](LICENSE).
 ## Data freshness
 
 The demand anchor and the breakeven bands are constants in `src/`, taken from a dated STEO
-vintage and the Dallas Fed survey. `tools/refresh_eia.py` fetches the current STEO series,
-writes `data/eia_steo_snapshot.json`, and prints how far the anchor has moved — a drift of
-more than about 1 mmb/d is the signal to re-anchor the curve rather than to trust the old
-number.
+vintage and the Dallas Fed survey. `tools/refresh_eia.py` fetches the current vintage from
+EIA's **bulk archive** — a static 18 MB zip at `api.eia.gov/bulk/STEO.zip`, no API key, no
+rate limit — writes `data/eia_steo_snapshot.json`, and prints how far the anchor has moved.
 
 ```bash
-python tools/refresh_eia.py --list-series "world crude"   # resolve series IDs once
-python tools/refresh_eia.py --write                       # needs EIA_API_KEY
+python tools/refresh_eia.py --list-series "world crude"   # find a series id, no key needed
+python tools/refresh_eia.py --write                       # fetch, validate, write
 python tools/refresh_eia.py --check 150                   # age gate, used in CI
 ```
+
+Checked against the November 2026 vintage: world crude production is **82.15 mmb/d** for
+2027-12 against the model's **82.30 mmb/d** anchor — a drift of **-0.15 mmb/d**, i.e. the
+anchor still holds. Total liquids consumption is 106.03 mmb/d and is reported as context
+only: it includes NGLs, biofuels and processing gains, so it is not comparable with a crude
+anchor. That distinction is the reason the tool compares one series and not the other.
 
 `.github/workflows/data-refresh.yml` runs monthly and opens a pull request when the
 snapshot moves. Series IDs live in `tools/eia_series.json` because EIA re-issues them
