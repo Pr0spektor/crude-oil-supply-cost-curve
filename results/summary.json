@@ -8,6 +8,52 @@
     "marginal_segment": "Arctic / frontier",
     "supplied": true
   },
+  "market_clearing": {
+    "state": "supply_capped",
+    "price": 83.31,
+    "quantity_mmbd": 82.1,
+    "marginal_segment": "Arctic / frontier",
+    "marginal_cost": 78.0,
+    "scarcity_rent": 5.31,
+    "shortfall_at_marginal_cost_mmbd": 0.325,
+    "cost_bracket": [
+      70.0,
+      78.0
+    ],
+    "demand_at_marginal_cost_mmbd": 82.425,
+    "demand_curve": {
+      "anchor_mmbd": 82.3,
+      "anchor_price": 80.0,
+      "elasticity": 0.06,
+      "source": "EIA STEO crude+condensate demand 2024; IEA OMR refinery runs 2025 as the upper bound"
+    },
+    "capacity_mmbd": 82.1,
+    "distribution": {
+      "n": 10000,
+      "seed": 42,
+      "anchor_mmbd": 82.3,
+      "anchor_sd_mmbd": 0.45,
+      "elasticity_range": [
+        0.03,
+        0.1
+      ],
+      "price_p10": 78.21,
+      "price_p50": 85.27,
+      "price_p90": 94.33,
+      "price_mean": 86.15,
+      "state_share": {
+        "supply_capped": 0.648,
+        "interior": 0.352
+      },
+      "marginal_node_probability": {
+        "Arctic / frontier": 0.841,
+        "Canada oil sands": 0.145,
+        "US tight oil \u2014 other basins": 0.01,
+        "Venezuela extra-heavy": 0.003,
+        "US tight oil \u2014 Permian": 0.002
+      }
+    }
+  },
   "avg_cost_to_meet_demand": 40.0,
   "price_scenarios": {
     "stress_40": {
@@ -22,9 +68,9 @@
       "cash": {
         "price": 40.0,
         "cost_view": "cash",
-        "at_risk_mmbd": 9.100000000000001,
+        "at_risk_mmbd": 9.1,
         "economic_mmbd": 73.0,
-        "at_risk_share": 0.1108404384896468
+        "at_risk_share": 0.11084043848964678
       }
     },
     "base_65": {
@@ -66,7 +112,7 @@
     "stress_40": {
       "price": 40.0,
       "n": 10000,
-      "mean_at_risk_mmbd": 43.753200000004405,
+      "mean_at_risk_mmbd": 43.7532,
       "p10": 35.599999999999994,
       "p50": 44.7,
       "p90": 52.900000000000006,
@@ -76,7 +122,7 @@
     "base_65": {
       "price": 65.0,
       "n": 10000,
-      "mean_at_risk_mmbd": 6.990540000000238,
+      "mean_at_risk_mmbd": 6.990540000000001,
       "p10": 4.1,
       "p50": 5.8,
       "p90": 11.100000000000001,
@@ -86,7 +132,7 @@
     "high_85": {
       "price": 85.0,
       "n": 10000,
-      "mean_at_risk_mmbd": 0.15495999999999463,
+      "mean_at_risk_mmbd": 0.15496000000000001,
       "p10": 0.0,
       "p50": 0.0,
       "p90": 0.8,
@@ -98,16 +144,19 @@
     "base": {
       "inflation": 0.0,
       "marginal_barrel_at_demand": 78.0,
+      "clearing_price": 83.31,
       "at_risk_at_65_full": 4.1
     },
     "supply_chain_+15%": {
       "inflation": 0.15,
       "marginal_barrel_at_demand": 89.69999999999999,
+      "clearing_price": 89.7,
       "at_risk_at_65_full": 15.3
     },
     "deflation_-10%": {
       "inflation": -0.1,
       "marginal_barrel_at_demand": 70.2,
+      "clearing_price": 83.31,
       "at_risk_at_65_full": 0.8
     }
   }

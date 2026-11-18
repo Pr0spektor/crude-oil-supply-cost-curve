@@ -7,3 +7,5 @@ __pycache__/
 
 # local secrets — never commit
 .env
+# regenerable API cache (never commit)
+results/cache/

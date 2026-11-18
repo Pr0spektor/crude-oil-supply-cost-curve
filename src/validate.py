@@ -40,7 +40,7 @@ def checks():
         if abs(u["at_risk_mmbd"] + u["economic_mmbd"] - total_supply(SEGMENTS)) > 1e-9:
             errs.append(f"at-risk+economic != total at ${p}")
     # 5) crude+condensate reconciles below total liquids
-    if not (0.70 * TOTAL_LIQUIDS_2024 <= total_supply(SEGMENTS) <= TOTAL_LIQUIDS_2024):
+    if not (0.79 * TOTAL_LIQUIDS_2024 <= total_supply(SEGMENTS) <= 0.81 * TOTAL_LIQUIDS_2024):
         errs.append("modelled supply does not reconcile with total liquids")
     # 6) every node has a carbon intensity
     for s in SEGMENTS:

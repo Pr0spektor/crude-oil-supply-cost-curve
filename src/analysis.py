@@ -10,6 +10,7 @@ from data import (SEGMENTS, DEMAND_MMBD, PRICE_SCENARIOS, COST_INFLATION_SCENARI
 from costcurve import (build_curve, total_supply, marginal_barrel, uneconomic_volume,
                        price_sensitivity, monte_carlo_at_risk, apply_cost_inflation,
                        average_cost_to_meet)
+import demand as dm
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, "results")
@@ -24,6 +25,9 @@ def compute():
         "total_liquids_ref_mmbd": TOTAL_LIQUIDS_2024,
         "demand_mmbd": DEMAND_MMBD,
         "marginal_barrel": marginal_barrel(curve, DEMAND_MMBD),
+        # Clearing price from the balance between an independent demand curve and the cost
+        # curve, rather than from the last (most expensive) node. See src/demand.py.
+        "market_clearing": dm.summary(SEGMENTS, dm.DEFAULT_DEMAND, n=10000, seed=42),
         "avg_cost_to_meet_demand": round(average_cost_to_meet(curve, DEMAND_MMBD), 1),
         "price_scenarios": {}, "monte_carlo": {}, "cost_inflation": {},
     }
@@ -39,6 +43,7 @@ def compute():
         out["cost_inflation"][name] = {
             "inflation": infl,
             "marginal_barrel_at_demand": marginal_barrel(build_curve(segs, "full"), DEMAND_MMBD)["marginal_cost"],
+            "clearing_price": dm.clearing(build_curve(segs, "full"), dm.DEFAULT_DEMAND)["price"],
             "at_risk_at_65_full": uneconomic_volume(segs, 65, "full")["at_risk_mmbd"],
         }
     return out
@@ -61,6 +66,15 @@ def charts():
     for label, price in PRICE_SCENARIOS.items():
         ax.axhline(price, ls="--", lw=1, color="#C0504D")
         ax.text(0.3, price + 0.7, f"${price:.0f}", color="#C0504D", fontsize=8)
+    # clearing price from the demand/supply balance, with its P10-P90 band
+    mc = dm.summary(SEGMENTS, dm.DEFAULT_DEMAND, n=2000, seed=42)
+    ax.axhspan(mc["distribution"]["price_p10"], mc["distribution"]["price_p90"],
+               color="#4F9D69", alpha=0.12, zorder=0,
+               label="Clearing price P10–P90")
+    ax.axhline(mc["price"], color="#2E7D4F", lw=1.6,
+               label=f"Clearing price ${mc['price']:.0f}")
+    ax.axvline(mc["quantity_mmbd"], color="#2E7D4F", lw=1, ls=":")
+    ax.legend(fontsize=8, loc="upper left")
     ax.set_xlabel("Cumulative crude + condensate (million barrels/day)")
     ax.set_ylabel("Full-cycle economic breakeven ($/bbl)")
     ax.set_title("Global crude-oil supply cost curve with breakeven uncertainty")
@@ -123,6 +137,7 @@ def write_memo(s):
     base = s["price_scenarios"]["base_65"]
     stress = s["price_scenarios"]["stress_40"]
     mc65 = s["monte_carlo"]["base_65"]
+    mc = s["market_clearing"]
     infl = s["cost_inflation"]["supply_chain_+15%"]
     memo = f"""# Insight memo — Global crude-oil supply at risk
 
@@ -131,14 +146,23 @@ def write_memo(s):
 ## Situation
 Global crude + condensate supply is ≈{s['supply_crude_condensate_mmbd']} mmb/d
 (part of ≈{s['total_liquids_ref_mmbd']} mmb/d total liquids). Ranking it cheapest-first
-on full-cycle economic breakeven produces the supply cost curve. To clear demand of
-≈{s['demand_mmbd']:.0f} mmb/d the marginal barrel costs about
-${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['marginal_segment']}).
+on full-cycle economic breakeven produces the supply cost curve. Demand is a separate,
+price-elastic curve anchored on ≈{mc['demand_curve']['anchor_mmbd']:.1f} mmb/d at
+${mc['demand_curve']['anchor_price']:.0f}/bbl — EIA crude + condensate demand, with IEA's
+83.2 mb/d refinery runs as the upper bound — and not on the supply build-up.
+
+The two meet at **${mc['price']:.1f}/bbl** (P10–P90 ${mc['distribution']['price_p10']:.0f}–${mc['distribution']['price_p90']:.0f}).
+At the central anchor, demand at the top of the curve exceeds deliverable supply by
+{mc['shortfall_at_marginal_cost_mmbd']:.2f} mmb/d, so the price is set by that balance and carries a
+scarcity rent of **${mc['scarcity_rent']:.1f}/bbl** over the ${mc['marginal_cost']:.0f} cost of the last node.
 
 ## Key findings
-1. **The market is cost-segmented.** Middle East onshore clears well below $30/bbl,
-   Brazil pre-salt is a low-cost deepwater outlier (≈$35), US shale sits mid-curve
-   (≈$61–63, Dallas Fed Q1'25), and oil sands / Arctic anchor the high end ($70–78).
+1. **The price comes from the balance, not from the most expensive node.** The Arctic/frontier
+   node sets the price in {mc['distribution']['marginal_node_probability'].get('Arctic / frontier', 0)*100:.0f}% of
+   Monte-Carlo draws and Canadian oil sands in
+   {mc['distribution']['marginal_node_probability'].get('Canada oil sands', 0)*100:.0f}% — the
+   "marginal barrel" is a probability, not a fact. Middle East onshore still clears below $30,
+   Brazil pre-salt sits near $35 and US shale at $61–63 (Dallas Fed Q1'25).
 2. **Full-cycle vs cash cost are very different risks.** At ${stress['price']:.0f}/bbl,
    {stress['full_cycle']['at_risk_mmbd']:.1f} mmb/d ({stress['full_cycle']['at_risk_share']*100:.0f}%)
    cannot justify **new** investment, but only {stress['cash']['at_risk_mmbd']:.1f} mmb/d is
@@ -147,8 +171,8 @@ ${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['margina
    point estimate is {base['full_cycle']['at_risk_mmbd']:.1f} mmb/d at risk, but Monte-Carlo
    (10k draws over breakeven ranges) puts the P90 at {mc65['p90']:.1f} mmb/d — a meaningful tail.
 4. **Cost inflation is a price-equivalent.** A +15% supply-chain cost shock lifts the
-   marginal barrel to ${infl['marginal_barrel_at_demand']:.0f}/bbl and raises at-risk volume
-   at $65 to {infl['at_risk_at_65_full']:.1f} mmb/d.
+   clearing price to ${infl['clearing_price']:.0f}/bbl (from ${mc['price']:.0f}) and raises
+   at-risk volume at $65 to {infl['at_risk_at_65_full']:.1f} mmb/d.
 5. **A carbon price re-ranks by intensity, not just level.** At $100/tCO2e the highest-
    intensity barrels (oil sands ≈+$11/bbl, extra-heavy ≈+$12/bbl) take the biggest hit,
    while low-intensity supply (Brazil pre-salt, low-flare Gulf) gains relative position —
@@ -157,8 +181,9 @@ ${s['marginal_barrel']['marginal_cost']:.0f}/bbl ({s['marginal_barrel']['margina
 ## Implications
 - A sustained sub-$45 price threatens future supply growth far more than current output,
   so price weakness shows up first as deferred FIDs, not shut-ins.
-- The clearing price is set by high-cost marginal supply (oil sands, Arctic, mature offshore);
-  those segments are the swing factor for both price and investment.
+- Whenever demand exceeds what the curve can deliver, the clearing price sits above the cost of
+  the marginal barrel and the gap is a scarcity rent. That rent — not the breakeven of the last
+  node — is what a disruption or a demand surprise moves first.
 
 ## Recommendation
 Track the **full-cycle curve for investment/FID decisions** and the **cash-cost curve for
@@ -180,8 +205,11 @@ def main():
         json.dump(s, f, indent=2)
     charts()
     write_memo(s)
-    print("Analysis complete. Supply %.1f mmb/d | marginal barrel $%.0f | base at-risk P50 %.1f mmb/d"
-          % (s["supply_crude_condensate_mmbd"], s["marginal_barrel"]["marginal_cost"],
+    mc = s["market_clearing"]
+    print("Analysis complete. Supply %.1f mmb/d | clearing $%.1f (P10-P90 %.0f-%.0f, %s) "
+          "| base at-risk P50 %.1f mmb/d"
+          % (s["supply_crude_condensate_mmbd"], mc["price"], mc["distribution"]["price_p10"],
+             mc["distribution"]["price_p90"], mc["state"],
              s["monte_carlo"]["base_65"]["p50"]))
 
 

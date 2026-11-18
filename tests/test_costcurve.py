@@ -215,13 +215,20 @@ def test_higher_demand_raises_clearing_price():
     assert hi > lo
 
 def test_fetch_falls_back_without_key(monkeypatch=None):
-    import os, fetch
+    import os, tempfile, fetch
     os.environ.pop("EIA_API_KEY", None)
-    r = fetch.refresh_world_production()          # no key -> no network -> fallback
-    assert r["source"] == "fallback"
-    assert 70.0 < r["world_crude_mmbd"] < 105.0
-    v, src = fetch.fetch_series("world_crude_mbpd")
-    assert v is None and src == "fallback"
+    # Isolate the on-disk cache: a leftover results/cache/*.json from a live run would
+    # otherwise make this test return source="cache" and fail on a clean checkout.
+    old_cache = fetch.CACHE_DIR
+    fetch.CACHE_DIR = tempfile.mkdtemp(prefix="costcurve-cache-")
+    try:
+        r = fetch.refresh_world_production()      # no key -> no network -> fallback
+        assert r["source"] == "fallback"
+        assert 70.0 < r["world_crude_mmbd"] < 105.0
+        v, src = fetch.fetch_series("world_crude_mbpd")
+        assert v is None and src == "fallback"
+    finally:
+        fetch.CACHE_DIR = old_cache
 
 if __name__ == "__main__":
     # Collect all test functions
