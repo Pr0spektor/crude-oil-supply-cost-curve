@@ -124,3 +124,54 @@ if __name__ == "__main__":
                 failed += 1
                 print("FAIL", name, exc)
     sys.exit(1 if failed else 0)
+
+
+# ---------------------------------------------------------------- spare capacity ---
+
+def test_spare_curve_is_monotone_and_bounded():
+    from spare import SpareCapacity
+    s = SpareCapacity(capacity_mmbd=4.0, floor_price=80.0, ceiling_price=120.0)
+    assert s.quantity(79.0) == 0.0
+    assert s.quantity(80.0) == 0.0
+    assert s.quantity(100.0) == pytest.approx(2.0)
+    assert s.quantity(130.0) == 4.0
+    assert s.quantity(90.0) < s.quantity(110.0)
+    assert s.price_for(2.0) == pytest.approx(100.0)
+
+
+def test_spare_closes_a_small_gap_without_repricing_the_whole_curve():
+    from spare import SpareCapacity
+    # Demand 21.0 against 20.0 of cost-curve capacity: the 1.0 mmb/d gap is swing supply.
+    d = DemandCurve(21.0, 60.0, 0.06)
+    sp = SpareCapacity(4.0, 60.0, 120.0)
+    r = clearing(build_curve(TWO_NODES, "full"), d, sp)
+    assert r["state"] == "spare_marginal"
+    assert 60.0 < r["price"] < 120.0
+    assert 0.0 < r["spare_mmbd"] < 4.0
+    assert r["scarcity_rent"] == 0.0
+
+
+def test_without_spare_the_same_gap_becomes_a_scarcity_price():
+    d = DemandCurve(21.0, 60.0, 0.06)
+    no_spare = clearing(build_curve(TWO_NODES, "full"), d)
+    with_spare = clearing(build_curve(TWO_NODES, "full"), d, __import__("spare").DEFAULT_SPARE)
+    assert no_spare["state"] == "supply_capped"
+    assert with_spare["price"] < no_spare["price"]
+
+
+def test_spare_exhaustion_returns_a_rationing_price():
+    from spare import SpareCapacity
+    d = DemandCurve(40.0, 60.0, 0.06)
+    r = clearing(build_curve(TWO_NODES, "full"), d, SpareCapacity(2.0, 60.0, 120.0))
+    assert r["state"] == "supply_capped"
+    assert r["price"] > 120.0
+    assert r["spare_mmbd"] == pytest.approx(2.0)
+
+
+def test_real_curve_clears_on_spare_not_on_the_top_node():
+    from spare import DEFAULT_SPARE
+    s = summary(SEGMENTS, spare=DEFAULT_SPARE, n=600, seed=42)
+    assert s["state"] in {"spare_marginal", "interior"}
+    assert s["price"] < 100
+    assert s["distribution"]["spare_capacity_mmbd"] == pytest.approx(4.0)
+    assert "OPEC+ spare" in s["distribution"]["marginal_node_probability"]

@@ -44,25 +44,33 @@ elasticity    = 0.06         short-run, literature range 0.03-0.10
 ```
 
 `clearing(curve, demand)` then solves the balance and returns one of three states:
+Supply is the cost curve *plus* swing capacity (`src/spare.py`): a linear spare curve between a
+floor and a ceiling price, 4 mmb/d at the midpoint of effective OPEC+ spare in 2024-25 (EIA STEO,
+IEA OMR), floor $80/bbl (IMF fiscal breakevens), ceiling $120/bbl (demand destruction becomes
+visible). `clearing(curve, demand, spare)` solves the balance and returns one of four states:
 
 | State | Meaning | Price |
 |---|---|---|
 | `interior` | demand is met inside the curve | cost of the marginal node |
 | `demand_capped` | the cheapest node already covers demand | cost of the cheapest node |
+| `spare_marginal` | the gap is closed by swing capacity | spare-curve price at that volume |
 | `supply_capped` | demand exceeds everything the curve can deliver | scarcity price above marginal cost |
 
-In the `supply_capped` case the price is *not* a cost of production: it is the price at which
-demand falls to the deliverable volume, and the difference from the top of the curve is reported
-as `scarcity_rent`. `extrapolated` flags cases where the constant-elasticity form is being
-stretched beyond a 50% rent.
+The balance is solved by bisection on excess demand, so the price is continuous instead of
+snapping to the next node. In the `supply_capped` case — spare exhausted as well — the price is
+*not* a cost of production: it is the price at which demand falls to the deliverable volume, and
+the difference from the ceiling is reported as `scarcity_rent`. `extrapolated` flags cases where
+the constant-elasticity form is being stretched beyond a 50% rent.
 
 `clearing_distribution()` draws the demand anchor (normal, sd 0.45 mmb/d), the elasticity
-(uniform 0.03-0.10) and every breakeven band (triangular) to produce a price distribution and,
-more usefully, the probability that each node is the marginal one — the question a single
+(uniform 0.03-0.10), spare capacity (normal, sd 0.5 mmb/d, clipped to 2.0-5.5) and every
+breakeven band (triangular) to produce a price distribution and, more usefully, the probability
+that each source — including spare — is the marginal one. That is the question a single
 "marginal barrel" number cannot answer.
 
-Limitation: the curve has no OPEC+ spare capacity, so when demand exceeds 82.1 mmb/d the model
-prices rationing rather than a swing producer. That is stated in the output rather than hidden.
+Limitation: spare is modelled as one aggregate curve. It does not distinguish who holds it, so it
+cannot price a producer-specific outage (Libya, Iran) or the difference between spare that is
+online in 30 days and spare that needs 90.
 
 ## Validation
 - Modelled crude + condensate (≈82 mmb/d) reconciles with total liquids (≈103 mmb/d,

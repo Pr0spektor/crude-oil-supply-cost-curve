@@ -43,7 +43,8 @@ def compute():
         out["cost_inflation"][name] = {
             "inflation": infl,
             "marginal_barrel_at_demand": marginal_barrel(build_curve(segs, "full"), DEMAND_MMBD)["marginal_cost"],
-            "clearing_price": dm.clearing(build_curve(segs, "full"), dm.DEFAULT_DEMAND)["price"],
+            "clearing_price": dm.clearing(build_curve(segs, "full"), dm.DEFAULT_DEMAND,
+                                          dm.DEFAULT_SPARE)["price"],
             "at_risk_at_65_full": uneconomic_volume(segs, 65, "full")["at_risk_mmbd"],
         }
     return out
@@ -152,14 +153,15 @@ ${mc['demand_curve']['anchor_price']:.0f}/bbl — EIA crude + condensate demand,
 83.2 mb/d refinery runs as the upper bound — and not on the supply build-up.
 
 The two meet at **${mc['price']:.1f}/bbl** (P10–P90 ${mc['distribution']['price_p10']:.0f}–${mc['distribution']['price_p90']:.0f}).
-At the central anchor, demand at the top of the curve exceeds deliverable supply by
-{mc['shortfall_at_marginal_cost_mmbd']:.2f} mmb/d, so the price is set by that balance and carries a
-scarcity rent of **${mc['scarcity_rent']:.1f}/bbl** over the ${mc['marginal_cost']:.0f} cost of the last node.
+At the central anchor the cost curve alone delivers {s['supply_crude_condensate_mmbd']:.1f} mmb/d, so the
+gap to demand is closed by **{mc['spare_mmbd']:.2f} mmb/d of OPEC+ spare** — {mc['spare_utilisation']*100:.0f}% of the
+{mc['spare_capacity_mmbd']:.1f} mmb/d that exists, offered at ${mc['marginal_cost']:.0f}/bbl. The marginal barrel is
+swing capacity, not the Arctic.
 
 ## Key findings
-1. **The price comes from the balance, not from the most expensive node.** The Arctic/frontier
-   node sets the price in {mc['distribution']['marginal_node_probability'].get('Arctic / frontier', 0)*100:.0f}% of
-   Monte-Carlo draws and Canadian oil sands in
+1. **The price comes from the balance, not from the most expensive node.** The OPEC+ spare curve sets the price in {mc['distribution']['marginal_node_probability'].get('OPEC+ spare', 0)*100:.0f}% of
+   Monte-Carlo draws, the Arctic/frontier in
+   {mc['distribution']['marginal_node_probability'].get('Arctic / frontier', 0)*100:.0f}% and Canadian oil sands in
    {mc['distribution']['marginal_node_probability'].get('Canada oil sands', 0)*100:.0f}% — the
    "marginal barrel" is a probability, not a fact. Middle East onshore still clears below $30,
    Brazil pre-salt sits near $35 and US shale at $61–63 (Dallas Fed Q1'25).
@@ -181,9 +183,9 @@ scarcity rent of **${mc['scarcity_rent']:.1f}/bbl** over the ${mc['marginal_cost
 ## Implications
 - A sustained sub-$45 price threatens future supply growth far more than current output,
   so price weakness shows up first as deferred FIDs, not shut-ins.
-- Whenever demand exceeds what the curve can deliver, the clearing price sits above the cost of
-  the marginal barrel and the gap is a scarcity rent. That rent — not the breakeven of the last
-  node — is what a disruption or a demand surprise moves first.
+- A small gap is closed by spare and barely moves the price; a large one exhausts spare and turns
+  the price into a rationing price. Spare utilisation, not the breakeven of the last node, is what
+  a disruption moves first.
 
 ## Recommendation
 Track the **full-cycle curve for investment/FID decisions** and the **cash-cost curve for

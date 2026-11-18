@@ -24,7 +24,7 @@ so the published result is auditable by anyone without credentials:
 git clone https://github.com/Pr0spektor/crude-oil-supply-cost-curve.git
 cd crude-oil-supply-cost-curve
 pip install -r requirements.txt
-python tests/test_costcurve.py     # 26 engine tests (+3 data guards, +11 demand tests under pytest)
+python tests/test_costcurve.py     # 26 engine tests (+3 data guards, +16 demand tests under pytest)
 python src/analysis.py             # charts + results/summary.json + INSIGHT_MEMO.md
 ```
 
@@ -58,10 +58,11 @@ off the curve, with the uncertainty around the answer made explicit.
 | **$85** | 0 | 0 | 0 – 0.8 |
 
 **Clearing price ≈ $83/bbl** (P10–P90 $78–$94) against an independent demand of ≈82.3 mmb/d at $80.
-At the top of the curve demand exceeds deliverable supply by 0.3 mmb/d, so the price carries a
-**≈$5/bbl scarcity rent** over the $78 cost of the last node. The Arctic/frontier node is marginal
-in **84%** of Monte-Carlo draws and Canadian oil sands in **14%** — the marginal barrel is a
-probability, not a fact. A **+15%** cost shock lifts the clearing price to **$90** and at-risk
+**Clearing price ≈ $81/bbl** (P10–P90 $77–$88) against an independent demand of ≈82.3 mmb/d at $80.
+The cost curve alone delivers 82.1 mmb/d, so the 0.2 mmb/d gap is closed by **0.12 mmb/d of OPEC+
+spare** — 3% of the 4 mmb/d that exists. The swing barrel sets the price in **73%** of Monte-Carlo
+draws, the Arctic/frontier in **20%** and Canadian oil sands in **5%** — the marginal barrel is a
+probability, not a fact. A **+15%** cost shock lifts the clearing price to **$86** and at-risk
 volume at $65 to ≈15 mmb/d.
 *US-shale nodes use Dallas Fed Q1 2025 breakevens ($61–63 new well; $33–41 shut-in).*
 
@@ -70,8 +71,11 @@ crude demand (82.3 mmb/d at $80/bbl, EIA; IEA's 83.2 mb/d refinery runs bound th
 on the supply build-up. The earlier version set demand equal to modelled supply, which made the
 most expensive node marginal by construction: a 0.01 mmb/d change moved the answer from $70 to
 $78 and no uncertainty was attached. When demand at the top of the curve exceeds what the curve
-can deliver, the market clears *above* marginal cost and the gap is a scarcity rent. Both the
-point estimate and the P10–P90 band now come from that balance (`src/demand.py`).
+can deliver, the gap is offered to OPEC+ swing capacity rather than priced as rationing: spare
+enters as a linear supply curve from $80 to $120/bbl, 4 mmb/d at the midpoint of EIA/IEA effective
+spare estimates. Only when that is exhausted does the price become a rationing price, and the
+model says so. Both the point estimate and the P10–P90 band come from that balance
+(`src/demand.py`, `src/spare.py`).
 
 ![Supply cost curve with uncertainty](results/supply_cost_curve.png)
 ![Supply at risk vs price](results/price_sensitivity.png)
@@ -110,7 +114,7 @@ r/costcurve.R        # R port with self-test (Rscript r/costcurve.R)
 vba/CostCurve.bas    # Excel VBA module (AtRiskVolume / EconomicVolume / MarginalBarrel)
 src/analysis.py      # charts + summary.json + model-driven INSIGHT_MEMO.md
 src/build_workbook.py# model.xlsx: Outputs (live SUMIF) · Data · CostCurve · Scenarios · MonteCarlo
-tests/test_costcurve.py # 26 engine tests + 3 data guards + 11 demand tests (40 under pytest)
+tests/test_costcurve.py # 26 engine tests + 3 data guards + 11 demand tests (45 under pytest)
 docs/METHODS.md · SOURCES.md · INSIGHT_MEMO.md
 ```
 

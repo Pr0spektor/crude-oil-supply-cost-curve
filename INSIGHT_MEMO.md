@@ -10,16 +10,17 @@ price-elastic curve anchored on ≈82.3 mmb/d at
 $80/bbl — EIA crude + condensate demand, with IEA's
 83.2 mb/d refinery runs as the upper bound — and not on the supply build-up.
 
-The two meet at **$83.3/bbl** (P10–P90 $78–$94).
-At the central anchor, demand at the top of the curve exceeds deliverable supply by
-0.33 mmb/d, so the price is set by that balance and carries a
-scarcity rent of **$5.3/bbl** over the $78 cost of the last node.
+The two meet at **$81.2/bbl** (P10–P90 $77–$88).
+At the central anchor the cost curve alone delivers 82.1 mmb/d, so the
+gap to demand is closed by **0.12 mmb/d of OPEC+ spare** — 3% of the
+4.0 mmb/d that exists, offered at $81/bbl. The marginal barrel is
+swing capacity, not the Arctic.
 
 ## Key findings
-1. **The price comes from the balance, not from the most expensive node.** The Arctic/frontier
-   node sets the price in 84% of
-   Monte-Carlo draws and Canadian oil sands in
-   14% — the
+1. **The price comes from the balance, not from the most expensive node.** The OPEC+ spare curve sets the price in 73% of
+   Monte-Carlo draws, the Arctic/frontier in
+   20% and Canadian oil sands in
+   5% — the
    "marginal barrel" is a probability, not a fact. Middle East onshore still clears below $30,
    Brazil pre-salt sits near $35 and US shale at $61–63 (Dallas Fed Q1'25).
 2. **Full-cycle vs cash cost are very different risks.** At $40/bbl,
@@ -30,7 +31,7 @@ scarcity rent of **$5.3/bbl** over the $78 cost of the last node.
    point estimate is 4.1 mmb/d at risk, but Monte-Carlo
    (10k draws over breakeven ranges) puts the P90 at 11.1 mmb/d — a meaningful tail.
 4. **Cost inflation is a price-equivalent.** A +15% supply-chain cost shock lifts the
-   clearing price to $90/bbl (from $83) and raises
+   clearing price to $86/bbl (from $81) and raises
    at-risk volume at $65 to 15.3 mmb/d.
 5. **A carbon price re-ranks by intensity, not just level.** At $100/tCO2e the highest-
    intensity barrels (oil sands ≈+$11/bbl, extra-heavy ≈+$12/bbl) take the biggest hit,
@@ -40,9 +41,9 @@ scarcity rent of **$5.3/bbl** over the $78 cost of the last node.
 ## Implications
 - A sustained sub-$45 price threatens future supply growth far more than current output,
   so price weakness shows up first as deferred FIDs, not shut-ins.
-- Whenever demand exceeds what the curve can deliver, the clearing price sits above the cost of
-  the marginal barrel and the gap is a scarcity rent. That rent — not the breakeven of the last
-  node — is what a disruption or a demand surprise moves first.
+- A small gap is closed by spare and barely moves the price; a large one exhausts spare and turns
+  the price into a rationing price. Spare utilisation, not the breakeven of the last node, is what
+  a disruption moves first.
 
 ## Recommendation
 Track the **full-cycle curve for investment/FID decisions** and the **cash-cost curve for

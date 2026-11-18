@@ -9,23 +9,34 @@
     "supplied": true
   },
   "market_clearing": {
-    "state": "supply_capped",
-    "price": 83.31,
-    "quantity_mmbd": 82.1,
-    "marginal_segment": "Arctic / frontier",
-    "marginal_cost": 78.0,
-    "scarcity_rent": 5.31,
-    "shortfall_at_marginal_cost_mmbd": 0.325,
+    "state": "spare_marginal",
+    "price": 81.24,
+    "quantity_mmbd": 82.224,
+    "marginal_segment": "OPEC+ spare",
+    "marginal_cost": 81.24,
+    "scarcity_rent": 0.0,
+    "shortfall_at_marginal_cost_mmbd": 0.0,
     "cost_bracket": [
-      70.0,
-      78.0
+      80.0,
+      120.0
     ],
-    "demand_at_marginal_cost_mmbd": 82.425,
+    "demand_at_marginal_cost_mmbd": 82.224,
+    "spare_mmbd": 0.124,
+    "spare_share_of_gap": 0.382,
+    "spare_capacity_mmbd": 4.0,
+    "spare_utilisation": 0.031,
+    "extrapolated": false,
     "demand_curve": {
       "anchor_mmbd": 82.3,
       "anchor_price": 80.0,
       "elasticity": 0.06,
       "source": "EIA STEO crude+condensate demand 2024; IEA OMR refinery runs 2025 as the upper bound"
+    },
+    "spare_curve": {
+      "capacity_mmbd": 4.0,
+      "floor_price": 80.0,
+      "ceiling_price": 120.0,
+      "source": "EIA STEO / IEA OMR effective OPEC+ spare 2024-25; IMF fiscal breakevens"
     },
     "capacity_mmbd": 82.1,
     "distribution": {
@@ -37,19 +48,24 @@
         0.03,
         0.1
       ],
-      "price_p10": 78.21,
-      "price_p50": 85.27,
-      "price_p90": 94.33,
-      "price_mean": 86.15,
+      "spare_capacity_mmbd": 4.0,
+      "spare_capacity_sd_mmbd": 0.5,
+      "price_p10": 77.2,
+      "price_p50": 82.27,
+      "price_p90": 87.52,
+      "price_mean": 82.32,
+      "spare_used_mean_mmbd": 0.322,
+      "spare_used_p90_mmbd": 0.776,
       "state_share": {
-        "supply_capped": 0.648,
-        "interior": 0.352
+        "spare_marginal": 0.733,
+        "interior": 0.267
       },
       "marginal_node_probability": {
-        "Arctic / frontier": 0.841,
-        "Canada oil sands": 0.145,
-        "US tight oil \u2014 other basins": 0.01,
-        "Venezuela extra-heavy": 0.003,
+        "OPEC+ spare": 0.733,
+        "Arctic / frontier": 0.205,
+        "Canada oil sands": 0.053,
+        "US tight oil \u2014 other basins": 0.006,
+        "Venezuela extra-heavy": 0.002,
         "US tight oil \u2014 Permian": 0.002
       }
     }
@@ -144,19 +160,19 @@
     "base": {
       "inflation": 0.0,
       "marginal_barrel_at_demand": 78.0,
-      "clearing_price": 83.31,
+      "clearing_price": 81.24,
       "at_risk_at_65_full": 4.1
     },
     "supply_chain_+15%": {
       "inflation": 0.15,
       "marginal_barrel_at_demand": 89.69999999999999,
-      "clearing_price": 89.7,
+      "clearing_price": 86.28,
       "at_risk_at_65_full": 15.3
     },
     "deflation_-10%": {
       "inflation": -0.1,
       "marginal_barrel_at_demand": 70.2,
-      "clearing_price": 83.31,
+      "clearing_price": 81.24,
       "at_risk_at_65_full": 0.8
     }
   }
