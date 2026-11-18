@@ -24,7 +24,7 @@ so the published result is auditable by anyone without credentials:
 git clone https://github.com/Pr0spektor/crude-oil-supply-cost-curve.git
 cd crude-oil-supply-cost-curve
 pip install -r requirements.txt
-python tests/test_costcurve.py     # 26 tests
+python tests/test_costcurve.py     # 26 engine tests (+3 data guards under pytest)
 python src/analysis.py             # charts + results/summary.json + INSIGHT_MEMO.md
 ```
 
@@ -53,7 +53,7 @@ off the curve, with the uncertainty around the answer made explicit.
 
 | Oil price | New-investment at risk (full-cycle) | Shut-in risk (cash) | Full-cycle P10–P90 (Monte-Carlo) |
 |---|---|---|---|
-| **$40** | 36.3 mmb/d (44%) | 6.5 mmb/d | 35.6 – 52.9 |
+| **$40** | 36.3 mmb/d (44%) | 9.1 mmb/d | 35.6 – 52.9 |
 | **$65** | 4.1 mmb/d (5%) | 0 | 4.1 – 11.1 |
 | **$85** | 0 | 0 | 0 – 0.8 |
 
@@ -98,7 +98,7 @@ r/costcurve.R        # R port with self-test (Rscript r/costcurve.R)
 vba/CostCurve.bas    # Excel VBA module (AtRiskVolume / EconomicVolume / MarginalBarrel)
 src/analysis.py      # charts + summary.json + model-driven INSIGHT_MEMO.md
 src/build_workbook.py# model.xlsx: Outputs (live SUMIF) · Data · CostCurve · Scenarios · MonteCarlo
-tests/test_costcurve.py # 18 unit tests (hand-checked fixtures, seeded Monte-Carlo)
+tests/test_costcurve.py # 26 engine tests + 3 data guards (29 under pytest)
 docs/METHODS.md · SOURCES.md · INSIGHT_MEMO.md
 ```
 
@@ -106,7 +106,7 @@ docs/METHODS.md · SOURCES.md · INSIGHT_MEMO.md
 ```bash
 python src/analysis.py        # charts + memo + summary.json
 python src/build_workbook.py  # interactive model.xlsx
-python tests/test_costcurve.py   # 18/18, standalone …
+python tests/test_costcurve.py   # 26/26, standalone …
 pytest -q                        # … or under pytest (CI)
 ```
 Open **`model.xlsx`**, change the oil-price cell on **Outputs**, and at-risk volumes

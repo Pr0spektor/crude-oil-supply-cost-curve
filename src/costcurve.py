@@ -132,10 +132,15 @@ def monte_carlo_at_risk(segments: Sequence[Segment], price: float,
 
     Returns mean and P10/P50/P90 of the at-risk volume.
     """
+    if cost != "full":
+        raise NotImplementedError(
+            "monte_carlo_at_risk only supports cost='full': the triangular band is derived "
+            "from the full-cycle breakeven, so sampling it for the cash view would silently "
+            "return a distribution for a different quantity."
+        )
     rng = random.Random(seed)
     draws = []
-    bands = [(s.production_mmbd, *s.band(), getattr(s, "breakeven_full" if cost == "full" else "cash_cost"))
-             for s in segments]
+    bands = [(s.production_mmbd, *s.band(), s.breakeven_full) for s in segments]
     for _ in range(n):
         at_risk = 0.0
         for prod, lo, hi, mode in bands:
