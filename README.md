@@ -134,3 +134,22 @@ database, not investment advice. See METHODS/SOURCES for full provenance and lim
 
 ## License
 MIT. See [LICENSE](LICENSE).
+
+## Data freshness
+
+The demand anchor and the breakeven bands are constants in `src/`, taken from a dated STEO
+vintage and the Dallas Fed survey. `tools/refresh_eia.py` fetches the current STEO series,
+writes `data/eia_steo_snapshot.json`, and prints how far the anchor has moved — a drift of
+more than about 1 mmb/d is the signal to re-anchor the curve rather than to trust the old
+number.
+
+```bash
+python tools/refresh_eia.py --list-series "world crude"   # resolve series IDs once
+python tools/refresh_eia.py --write                       # needs EIA_API_KEY
+python tools/refresh_eia.py --check 150                   # age gate, used in CI
+```
+
+`.github/workflows/data-refresh.yml` runs monthly and opens a pull request when the
+snapshot moves. Series IDs live in `tools/eia_series.json` because EIA re-issues them
+between vintages; an unset id is skipped with a warning instead of silently returning
+nothing.

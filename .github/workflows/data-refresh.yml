@@ -1,0 +1,43 @@
+name: Data refresh
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  steo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Refresh the STEO snapshot
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: python tools/refresh_eia.py --write
+      - name: Fail if the snapshot is older than 150 days
+        run: python tools/refresh_eia.py --check 150
+      - name: Open a pull request when the snapshot moved
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "data: refresh the EIA STEO snapshot"
+          title: "Data refresh: EIA STEO"
+          body: |
+            Automated refresh of the STEO snapshot behind the demand anchor.
+
+            Series IDs are configured in `tools/eia_series.json`. Without `EIA_API_KEY`
+            the job reports the snapshot age and exits cleanly, then the age gate fails
+            once the snapshot passes 150 days.
+          branch: data-refresh/eia
+          delete-branch: true
+          add-paths: data/eia_steo_snapshot.json

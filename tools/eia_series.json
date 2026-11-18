@@ -1,0 +1,17 @@
+{
+  "_note": "EIA re-issues STEO series between vintages, so IDs live here rather than in code. Confirm them once with: python tools/refresh_eia.py --list-series 'world crude'  (needs EIA_API_KEY), then paste the IDs below. An empty id is skipped with a warning rather than silently returning nothing.",
+  "series": [
+    {
+      "id": "",
+      "label": "World crude oil production",
+      "unit": "million barrels per day",
+      "search": "world crude oil production"
+    },
+    {
+      "id": "",
+      "label": "World liquid fuels consumption",
+      "unit": "million barrels per day",
+      "search": "world liquid fuels consumption"
+    }
+  ]
+}
